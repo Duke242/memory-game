@@ -1,35 +1,51 @@
-# ShipFast — Typescript
+# Number Memory Game
 
-Hey maker 👋 it's Marc from [ShipFast](https://shipfa.st/docs). Let's get your startup off the ground, FAST ⚡️
+A challenging game to test your numerical memory!
 
-<sub>**Watch/Star the repo to be notified when updates are pushed**</sub>
+## Objective
 
-## Get Started
+The objective of this game is to test and improve your ability to remember sequences of numbers. It's designed to challenge your short-term memory and help you enhance your recall skills.
 
-1. Follow the [Get Started Tutorial](https://shipfa.st/docs) to clone the repo and run your local server 💻
+## How to Play
 
-<sub>**Looking for the /pages router version?** Use this [documentation](https://shipfa.st/docs-old) instead</sub>
+1. The game will display a sequence of numbers.
+2. You'll have a few seconds to memorize the sequence.
+3. After the numbers disappear, you'll be prompted to input the sequence you remember.
+4. If you correctly recall the entire sequence, you move on to the next level with a longer sequence.
+5. If you make a mistake, the game ends, and you can start over to try and beat your high score.
 
-2. Follow the [Ship In 5 Minutes Tutorial](https://shipfa.st/docs/tutorials/ship-in-5-minutes) to learn the foundation and ship your app quickly ⚡️
+## Features
 
-## Links
+- Progressive difficulty: The game starts with shorter sequences and gradually increases in length.
+- Customizable time limit: Adjust how long you have to memorize the numbers.
+- High score tracking: Keep track of your best performances.
+- Various game modes:
+  - Classic: Remember the numbers in the exact order.
+  - Reverse: Recall the numbers in reverse order for an extra challenge.
+  - Sum: Remember the sum of all numbers shown.
 
--   [📚 Documentation](https://shipfa.st/docs)
--   [📣 Updates](https://shipfast.beehiiv.com/)
--   [🧑‍💻 Discord](https://shipfa.st/dashboard)
--   [🥇 Leaderboard](https://shipfa.st/leaderboard)
+## Benefits
 
-## Support
+- Improves short-term memory
+- Enhances concentration and focus
+- Boosts numerical recall abilities
+- Provides a fun way to exercise your brain
 
-Reach out to me on [Twitter](https://twitter.com/marc_louvion) or marc@shipfa.st
+## Getting Started
 
-\_
+To start playing, simply launch the game and select your preferred game mode. The game will guide you through the process, starting with a brief tutorial if it's your first time playing.
 
-Let's ship it, FAST ⚡️
+## Technical Requirements
 
-P.S.
+- Any modern web browser
+- JavaScript enabled
 
--   Want to showcase your startups? Get your [Indie Page](https://indiepa.ge?ref=shipfast_readme) and share your entrepreneur's journey. Join 3,132 founders ⭐️
--   Don't get banned from Stripe for 1 dispute. Use [ByeDispute](https://byedispute.com/?ref=shipfast_readme) to prevent them from happenening 🛡️
--   Make your launch go viral and get your first customers with [LaunchViral](https://launchvir.al/?ref=shipfast_readme) 🚀
--   Stop paying 0.4% per Stripe invoices [Zenvoice](https://zenvoice.io/?ref=shipfast_readme) 🤕
+## Contributing
+
+We welcome contributions to improve the game! If you have ideas for new features, improvements, or bug fixes, please feel free to submit a pull request or open an issue on our GitHub repository.
+
+## License
+
+This game is open-source and licensed under the MIT License. Feel free to use, modify, and distribute it as you see fit.
+
+Enjoy the game and happy memorizing!
