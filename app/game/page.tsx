@@ -11,6 +11,7 @@ const GamePage = () => {
   const [score, setScore] = useState(0)
   const [gameState, setGameState] = useState("setup") // 'setup', 'memorize', 'input', 'result', 'correct'
   const [timeRemaining, setTimeRemaining] = useState(100) // Percentage of time remaining
+  const [selectedTime, setSelectedTime] = useState(70)
 
   useEffect(() => {
     if (gameState === "memorize") {
@@ -27,7 +28,7 @@ const GamePage = () => {
             setGameState("input")
             return 0
           }
-          return prevTime - 100 / 70 // Decrease by 1.428% every 100ms to complete in 7 seconds
+          return prevTime - 100 / selectedTime // Decrease by 1.428% every 100ms to complete in 7 seconds
         })
       }, 100)
 
@@ -110,6 +111,46 @@ const GamePage = () => {
             >
               Start Game
             </button>
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select memorization time:
+              </label>
+              <div className="flex space-x-4">
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="time"
+                    value="30"
+                    checked={selectedTime === 30}
+                    onChange={(e) => setSelectedTime(parseInt(e.target.value))}
+                    className="form-radio text-blue-600"
+                  />
+                  <span className="ml-2">3 seconds</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="time"
+                    value="50"
+                    checked={selectedTime === 50}
+                    onChange={(e) => setSelectedTime(parseInt(e.target.value))}
+                    className="form-radio text-blue-600"
+                  />
+                  <span className="ml-2">5 seconds</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="time"
+                    value="70"
+                    checked={selectedTime === 70}
+                    onChange={(e) => setSelectedTime(parseInt(e.target.value))}
+                    className="form-radio text-blue-600"
+                  />
+                  <span className="ml-2">7 seconds</span>
+                </label>
+              </div>
+            </div>
           </>
         )}
 
