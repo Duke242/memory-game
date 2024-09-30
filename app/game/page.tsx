@@ -111,44 +111,24 @@ const GamePage = () => {
             >
               Start Game
             </button>
-            <div className="mt-4">
+            <div className="mt-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Select memorization time:
               </label>
-              <div className="flex space-x-4">
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="time"
-                    value="30"
-                    checked={selectedTime === 30}
-                    onChange={(e) => setSelectedTime(parseInt(e.target.value))}
-                    className="form-radio text-blue-600"
-                  />
-                  <span className="ml-2">3 seconds</span>
-                </label>
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="time"
-                    value="50"
-                    checked={selectedTime === 50}
-                    onChange={(e) => setSelectedTime(parseInt(e.target.value))}
-                    className="form-radio text-blue-600"
-                  />
-                  <span className="ml-2">5 seconds</span>
-                </label>
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="time"
-                    value="70"
-                    checked={selectedTime === 70}
-                    onChange={(e) => setSelectedTime(parseInt(e.target.value))}
-                    className="form-radio text-blue-600"
-                  />
-                  <span className="ml-2">7 seconds</span>
-                </label>
+              <div className="flex items-center space-x-4">
+                <input
+                  type="range"
+                  min={1}
+                  max={10}
+                  value={selectedTime / 10}
+                  onChange={(e) =>
+                    setSelectedTime(parseInt(e.target.value) * 10)
+                  }
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <span className="text-lg font-semibold text-blue-600">
+                  {selectedTime / 10}s
+                </span>
               </div>
             </div>
           </>
