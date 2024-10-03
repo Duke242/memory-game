@@ -47,7 +47,7 @@ function Page() {
         </h1>
 
         {gameState === "display" && (
-          <div className="grid grid-cols-4 gap-2 mb-4">
+          <div className="grid grid-cols-4 gap-2 mb-4 rounded-md">
             {coloredBoxes.map((isColored, index) => (
               <div
                 key={index}
@@ -68,7 +68,7 @@ function Page() {
                 .map((_, index) => (
                   <div
                     key={index}
-                    className={`w-16 h-16 ${
+                    className={`w-16 h-16 rounded-md ${
                       userSelection[index] ? "bg-blue-500" : "bg-gray-200"
                     } cursor-pointer`}
                     onClick={() => handleBoxClick(index)}
