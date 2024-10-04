@@ -137,7 +137,7 @@ const GamePage = () => {
                   onChange={(e) =>
                     setSelectedTime(parseInt(e.target.value) * 10)
                   }
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer"
                 />
                 <span className="text-xl font-bold text-blue-600">
                   {selectedTime / 10}s
