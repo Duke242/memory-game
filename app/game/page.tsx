@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react"
 import { CheckCircle, XCircle } from "lucide-react"
+import { GiBrain } from "react-icons/gi"
+import Link from "next/link"
 
 const GamePage = () => {
   const [startingDigits, setStartingDigits] = useState(1)
@@ -28,13 +30,13 @@ const GamePage = () => {
             setGameState("input")
             return 0
           }
-          return prevTime - 100 / selectedTime // Decrease by 1.428% every 100ms to complete in 7 seconds
+          return prevTime - 100 / selectedTime
         })
       }, 100)
 
       return () => clearInterval(timer)
     }
-  }, [gameState, score, startingDigits])
+  }, [gameState, score, startingDigits, selectedTime])
 
   useEffect(() => {
     if (gameState === "correct") {
@@ -92,27 +94,38 @@ const GamePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-blue-100 flex flex-col items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex flex-col items-center justify-center p-4">
+      <header className="w-full max-w-4xl mx-auto px-4 py-6 mb-8">
+        <nav className="flex justify-between items-center">
+          <Link
+            href="/"
+            className="text-2xl font-bold text-white flex items-center"
+          >
+            <GiBrain className="mr-2 text-3xl" />
+            MemoryMaster
+          </Link>
+        </nav>
+      </header>
+      <div className="bg-white bg-opacity-90 backdrop-blur-lg rounded-2xl shadow-2xl p-8 max-w-md w-full">
         {gameState === "setup" && (
           <>
-            <h1 className="text-2xl font-bold text-blue-600 mb-4">
+            <h1 className="text-3xl font-extrabold text-blue-600 mb-6">
               Number Memory Game
             </h1>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="mb-6">
+              <label className="block text-lg font-semibold text-gray-700 mb-3">
                 Select starting number of digits:
               </label>
               {renderDigitButtons()}
             </div>
             <button
               onClick={handleStartGame}
-              className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-300 mt-4"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
             >
               Start Game
             </button>
-            <div className="mt-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="mt-8">
+              <label className="block text-lg font-semibold text-gray-700 mb-3">
                 Select memorization time:
               </label>
               <div className="flex items-center space-x-4">
@@ -126,7 +139,7 @@ const GamePage = () => {
                   }
                   className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                 />
-                <span className="text-lg font-semibold text-blue-600">
+                <span className="text-xl font-bold text-blue-600">
                   {selectedTime / 10}s
                 </span>
               </div>
@@ -136,13 +149,15 @@ const GamePage = () => {
 
         {gameState === "memorize" && (
           <div className="text-center">
-            <h2 className="text-xl font-bold mb-4">Memorize this number:</h2>
-            <p className="text-4xl font-bold text-blue-600 mb-4">
+            <h2 className="text-2xl font-bold mb-6 text-blue-600">
+              Memorize this number:
+            </h2>
+            <p className="text-5xl font-extrabold text-blue-600 mb-6">
               {currentNumber}
             </p>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+            <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
               <div
-                className="bg-blue-600 h-2.5 rounded-full transition-all duration-100 ease-linear"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 h-3 rounded-full transition-all duration-100 ease-linear"
                 style={{ width: `${timeRemaining}%` }}
               ></div>
             </div>
@@ -151,19 +166,19 @@ const GamePage = () => {
 
         {gameState === "input" && (
           <div>
-            <h2 className="text-xl font-bold mb-4">
+            <h2 className="text-2xl font-bold mb-6 text-blue-600">
               Enter the number you memorized:
             </h2>
             <input
               type="number"
               value={userInput}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded mb-4 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-full p-3 border-2 border-blue-300 rounded-lg mb-6 text-xl [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus:outline-none focus:border-blue-500"
               autoFocus
             />
             <button
               onClick={handleSubmit}
-              className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-300"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
             >
               Submit
             </button>
@@ -172,27 +187,30 @@ const GamePage = () => {
 
         {gameState === "correct" && (
           <div className="text-center">
-            <CheckCircle className="mx-auto text-green-500" size={64} />
-            <p className="text-xl font-bold text-green-600 mt-4">Correct!</p>
+            <CheckCircle className="mx-auto text-green-500" size={80} />
+            <p className="text-3xl font-bold text-green-600 mt-6">Correct!</p>
           </div>
         )}
 
         {gameState === "result" && (
           <div className="text-center">
-            <XCircle className="mx-auto text-red-500" size={64} />
-            <h2 className="text-2xl font-bold mb-4">Game Over!</h2>
-            <p className="text-xl mb-4">Your score: {score}</p>
-            <p className="text-lg mb-4">
+            <XCircle className="mx-auto text-red-500" size={80} />
+            <h2 className="text-3xl font-bold text-red-600 mb-6">Game Over!</h2>
+            <p className="text-2xl mb-4">
+              Your score:{" "}
+              <span className="font-bold text-blue-600">{score}</span>
+            </p>
+            <p className="text-xl mb-4">
               The correct number was:{" "}
               <span className="font-bold text-green-600">{currentNumber}</span>
             </p>
-            <p className="text-lg mb-4">
+            <p className="text-xl mb-6">
               You entered:{" "}
               <span className="font-bold text-red-600">{lastInput}</span>
             </p>
             <button
               onClick={() => setGameState("setup")}
-              className="bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-300 mt-4"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
             >
               Play Again
             </button>
@@ -200,8 +218,8 @@ const GamePage = () => {
         )}
 
         {gameState !== "setup" && (
-          <div className="mt-4 text-center">
-            <p className="text-lg font-semibold">Score: {score}</p>
+          <div className="mt-6 text-center">
+            <p className="text-2xl font-bold text-blue-600">Score: {score}</p>
           </div>
         )}
       </div>
