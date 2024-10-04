@@ -1,29 +1,7 @@
 import React from "react"
 import Link from "next/link"
 import { GiBrain } from "react-icons/gi"
-
-const benefits = [
-  {
-    title: "Improve Memory",
-    icon: "🧠",
-    description: "Enhance your ability to retain and recall information.",
-  },
-  {
-    title: "Enhance Focus",
-    icon: "🎯",
-    description: "Sharpen your concentration and attention to detail.",
-  },
-  {
-    title: "Boost Recall",
-    icon: "💡",
-    description: "Quickly retrieve information from your memory.",
-  },
-  {
-    title: "Fun Exercise",
-    icon: "🏋️‍♂️",
-    description: "Enjoy a challenging and entertaining mental workout.",
-  },
-]
+import BenefitsSection from "@/components/BenefitsSection"
 
 export default function Page() {
   return (
@@ -66,26 +44,7 @@ export default function Page() {
         </div>
       </main>
 
-      <section className="bg-white text-gray-800 py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Benefits of Playing
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {benefits.map((benefit, index) => (
-              <div
-                key={index}
-                className="bg-blue-50 rounded-xl p-6 shadow-lg hover:shadow-xl transition duration-300 animate-fade-in-up"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className="text-4xl mb-4">{benefit.icon}</div>
-                <h3 className="text-xl font-semibold mb-2">{benefit.title}</h3>
-                <p className="text-gray-600">{benefit.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <BenefitsSection />
     </div>
   )
 }
