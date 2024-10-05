@@ -106,7 +106,7 @@ const GamePage = () => {
           </Link>
         </nav>
       </header>
-      <div className="bg-white bg-opacity-90 backdrop-blur-lg rounded-2xl shadow-2xl p-8 max-w-md w-full">
+      <div className="bg-white bg-opacity-90 backdrop-blur-lg rounded-2xl shadow-2xl p-8 w-fit">
         {gameState === "setup" && (
           <>
             <h1 className="text-3xl font-extrabold text-blue-600 mb-6">
@@ -148,13 +148,15 @@ const GamePage = () => {
         )}
 
         {gameState === "memorize" && (
-          <div className="text-center">
+          <div className="text-center w-full max-w-4xl mx-auto px-4">
             <h2 className="text-2xl font-bold mb-6 text-blue-600">
               Memorize this number:
             </h2>
-            <p className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-blue-600 mb-6 whitespace-nowrap overflow-x-auto">
-              {currentNumber}
-            </p>
+            <div className="overflow-x-auto mb-6 py-2">
+              <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-blue-600 whitespace-nowrap inline-block leading-normal">
+                {currentNumber}
+              </p>
+            </div>
             <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
               <div
                 className="bg-gradient-to-r from-blue-600 to-purple-600 h-3 rounded-full transition-all duration-100 ease-linear"
