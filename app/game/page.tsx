@@ -152,7 +152,7 @@ const GamePage = () => {
             <h2 className="text-2xl font-bold mb-6 text-blue-600">
               Memorize this number:
             </h2>
-            <p className="text-5xl font-extrabold text-blue-600 mb-6">
+            <p className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-blue-600 mb-6 whitespace-nowrap overflow-x-auto">
               {currentNumber}
             </p>
             <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
