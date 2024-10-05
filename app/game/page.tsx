@@ -17,9 +17,7 @@ const GamePage = () => {
 
   useEffect(() => {
     if (gameState === "memorize") {
-      const newNumber = generateRandomNumber(
-        Math.min(startingDigits + score, 20)
-      )
+      const newNumber = generateRandomNumber(score)
       setCurrentNumber(newNumber)
       setTimeRemaining(100)
 
@@ -36,7 +34,7 @@ const GamePage = () => {
 
       return () => clearInterval(timer)
     }
-  }, [gameState, score, startingDigits, selectedTime])
+  }, [gameState, score, selectedTime])
 
   useEffect(() => {
     if (gameState === "correct") {
@@ -54,7 +52,7 @@ const GamePage = () => {
   }
 
   const handleStartGame = () => {
-    setScore(0)
+    setScore(startingDigits)
     setGameState("memorize")
   }
 
@@ -200,7 +198,7 @@ const GamePage = () => {
             <h2 className="text-3xl font-bold text-red-600 mb-6">Game Over!</h2>
             <p className="text-2xl mb-4">
               Your score:{" "}
-              <span className="font-bold text-blue-600">{score}</span>
+              <span className="font-bold text-blue-600">{score} digits</span>
             </p>
             <p className="text-xl mb-4">
               The correct number was:{" "}
@@ -216,12 +214,6 @@ const GamePage = () => {
             >
               Play Again
             </button>
-          </div>
-        )}
-
-        {gameState !== "setup" && (
-          <div className="mt-6 text-center">
-            <p className="text-2xl font-bold text-blue-600">Score: {score}</p>
           </div>
         )}
       </div>
