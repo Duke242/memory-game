@@ -1,16 +1,16 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import ButtonSupport from "@/components/ButtonSupport";
+import Link from "next/link"
+import ButtonSupport from "@/components/ButtonSupport"
 
 // A simple error boundary to show a nice error page if something goes wrong (Error Boundary)
-// Users can contanct support, go to the main page or try to reset/refresh to fix the error
+// Users can contanct support, go to the main page or try to reset/refresh to fix the erro
 export default function Error({
   error,
   reset,
 }: {
-  error: Error;
-  reset: () => void;
+  error: Error
+  reset: () => void
 }) {
   return (
     <>
@@ -171,5 +171,5 @@ export default function Error({
         </div>
       </div>
     </>
-  );
+  )
 }
