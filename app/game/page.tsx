@@ -151,7 +151,7 @@ const GamePage = () => {
               Memorize this number:
             </h2>
             <div className="overflow-x-auto mb-6 py-2">
-              <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-blue-600 whitespace-nowrap inline-block leading-normal">
+              <p className="text-4xl md:text-4xl lg:text-5xl font-extrabold text-blue-600 whitespace-nowrap inline-block leading-normal">
                 {currentNumber}
               </p>
             </div>
