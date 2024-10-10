@@ -74,7 +74,7 @@ const GamePage = () => {
   const renderDigitButtons = () => {
     return (
       <div className="grid grid-cols-5 gap-2">
-        {[...Array(15)].map((_, i) => (
+        {[...Array(16)].map((_, i) => (
           <button
             key={i + 1}
             onClick={() => setStartingDigits(i + 1)}

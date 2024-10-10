@@ -1,17 +1,21 @@
 "use client"
+
 import React, { useState, useEffect } from "react"
 import { CheckCircle, XCircle } from "lucide-react"
 import { GiBrain } from "react-icons/gi"
 import Link from "next/link"
 
-const BoxGamePage = () => {
-  const [gameState, setGameState] = useState("setup") // 'setup', 'display', 'recall', 'result', 'correct'
+type GameState = "setup" | "display" | "recall" | "result" | "correct"
+
+interface BoxGamePageProps {}
+
+const BoxGamePage: React.FC<BoxGamePageProps> = () => {
+  const [gameState, setGameState] = useState<GameState>("setup")
   const [coloredBoxes, setColoredBoxes] = useState<boolean[]>([])
   const [userSelection, setUserSelection] = useState<boolean[]>([])
-  const [score, setScore] = useState(0)
-  const [difficulty, setDifficulty] = useState(4) // 4x4 grid by default
-  const [timeRemaining, setTimeRemaining] = useState(100) // Percentage of time remaining
-  const [displayTime, setDisplayTime] = useState(3) // 3 seconds display time by default
+  const [difficulty, setDifficulty] = useState<number>(4) // 4x4 grid by default
+  const [timeRemaining, setTimeRemaining] = useState<number>(100) // Percentage of time remaining
+  const [displayTime, setDisplayTime] = useState<number>(3) // 3 seconds display time by default
 
   useEffect(() => {
     if (gameState === "display") {
@@ -19,6 +23,7 @@ const BoxGamePage = () => {
         .fill(false)
         .map(() => Math.random() < 0.5)
       setColoredBoxes(newColoredBoxes)
+      setUserSelection(Array(difficulty * difficulty).fill(false))
       setTimeRemaining(100)
 
       const timer = setInterval(() => {
@@ -37,28 +42,24 @@ const BoxGamePage = () => {
   }, [gameState, difficulty, displayTime])
 
   const handleStartGame = () => {
-    setScore(0)
     setGameState("display")
   }
 
   const handleBoxClick = (index: number) => {
     if (gameState === "recall") {
-      const newSelection = [...userSelection]
-      newSelection[index] = !newSelection[index]
-      setUserSelection(newSelection)
+      setUserSelection((prev) => {
+        const newSelection = [...prev]
+        newSelection[index] = !newSelection[index]
+        return newSelection
+      })
     }
   }
 
   const handleSubmit = () => {
-    const newScore = coloredBoxes.reduce((acc, box, index) => {
-      return box === userSelection[index] ? acc + 1 : acc
-    }, 0)
-    setScore((prevScore) => prevScore + newScore)
-    if (newScore === coloredBoxes.length) {
-      setGameState("correct")
-    } else {
-      setGameState("result")
-    }
+    const isCorrect = coloredBoxes.every(
+      (isColored, index) => isColored === userSelection[index]
+    )
+    setGameState(isCorrect ? "correct" : "result")
   }
 
   useEffect(() => {
@@ -73,7 +74,7 @@ const BoxGamePage = () => {
   const renderGrid = (boxes: boolean[]) => {
     return (
       <div
-        className={`grid gap-2 mb-4`}
+        className="grid gap-2 mb-4"
         style={{
           gridTemplateColumns: `repeat(${difficulty}, minmax(0, 1fr))`,
         }}
@@ -82,12 +83,12 @@ const BoxGamePage = () => {
           <div
             key={index}
             className={`aspect-square rounded-md ${
-              isColored
+              gameState === "display" && isColored
                 ? "bg-blue-500"
                 : gameState === "recall"
                 ? "bg-gray-200 hover:bg-gray-300 cursor-pointer"
                 : "bg-gray-200"
-            }`}
+            } ${userSelection[index] ? "bg-blue-300" : ""}`}
             onClick={() => handleBoxClick(index)}
           ></div>
         ))}
@@ -201,23 +202,13 @@ const BoxGamePage = () => {
         {gameState === "result" && (
           <div className="text-center">
             <XCircle className="mx-auto text-red-500" size={80} />
-            <h2 className="text-3xl font-bold text-red-600 mb-6">Game Over!</h2>
-            <p className="text-2xl mb-4">
-              Your score:{" "}
-              <span className="font-bold text-blue-600">{score}</span>
-            </p>
+            <h2 className="text-3xl font-bold text-red-600 mb-6">Incorrect</h2>
             <button
               onClick={() => setGameState("setup")}
               className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
             >
-              Play Again
+              Try Again
             </button>
-          </div>
-        )}
-
-        {gameState !== "setup" && gameState !== "result" && (
-          <div className="mt-6 text-center">
-            <p className="text-2xl font-bold text-blue-600">Score: {score}</p>
           </div>
         )}
       </div>
