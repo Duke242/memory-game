@@ -29,14 +29,22 @@ export default function Page() {
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-blue-100">
               Challenge your mind and improve your memory with our exciting
-              Number Memory Game.
+              memory games.
             </p>
-            <Link
-              href="/game"
-              className="inline-block bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-full hover:bg-blue-100 transition duration-300 transform hover:scale-105 shadow-lg"
-            >
-              Start Playing Now
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/game"
+                className="inline-block bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-full hover:bg-blue-100 transition duration-300 transform hover:scale-105 shadow-lg text-center"
+              >
+                Play Number Memory
+              </Link>
+              <Link
+                href="/box-game"
+                className="inline-block text-blue-600 hover:bg-blue-100 bg-white font-bold text-lg px-8 py-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg text-center"
+              >
+                Play Box Memory
+              </Link>
+            </div>
           </div>
           <div className="md:w-1/2 flex justify-center animate-fade-in">
             <GiBrain className="text-white text-[300px] opacity-80" />
