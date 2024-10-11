@@ -73,12 +73,12 @@ const GamePage = () => {
 
   const renderDigitButtons = () => {
     return (
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-4 gap-2">
         {[...Array(16)].map((_, i) => (
           <button
             key={i + 1}
             onClick={() => setStartingDigits(i + 1)}
-            className={`py-2 px-4 rounded font-bold ${
+            className={`py-2 px-4 rounded font-bold transition-all duration-300 ${
               startingDigits === i + 1
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -116,17 +116,12 @@ const GamePage = () => {
               </label>
               {renderDigitButtons()}
             </div>
-            <button
-              onClick={handleStartGame}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
-            >
-              Start Game
-            </button>
+
             <div className="mt-8">
               <label className="block text-lg font-semibold text-gray-700 mb-3">
                 Select memorization time:
               </label>
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4 mb-6">
                 <input
                   type="range"
                   min={1}
@@ -142,6 +137,12 @@ const GamePage = () => {
                 </span>
               </div>
             </div>
+            <button
+              onClick={handleStartGame}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
+            >
+              Start Game
+            </button>
           </>
         )}
 
