@@ -86,9 +86,11 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
               gameState === "display" && isColored
                 ? "bg-blue-500"
                 : gameState === "recall"
-                ? "bg-gray-200 hover:bg-gray-300 cursor-pointer"
+                ? userSelection[index]
+                  ? "bg-blue-300"
+                  : "bg-gray-200 hover:bg-gray-300 cursor-pointer"
                 : "bg-gray-200"
-            } ${userSelection[index] ? "bg-blue-300" : ""}`}
+            }`}
             onClick={() => handleBoxClick(index)}
           ></div>
         ))}
