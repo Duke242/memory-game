@@ -12,12 +12,12 @@ export default function Page() {
             <GiBrain className="mr-2 text-3xl" />
             MemoryMaster
           </Link>
-          <Link
+          {/* <Link
             href="/login"
             className="bg-white text-blue-600 px-4 py-2 rounded-full font-semibold hover:bg-opacity-90 transition duration-300"
           >
             Sign In
-          </Link>
+          </Link> */}
         </nav>
       </header>
 
