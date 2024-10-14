@@ -47,7 +47,7 @@ export default function Page() {
             </div>
           </div>
           <div className="md:w-1/2 flex justify-center animate-fade-in">
-            <GiBrain className="text-white text-[300px] opacity-80" />
+            <GiBrain className="text-white text-[300px] opacity-80 hidden lg:block" />
           </div>
         </div>
       </main>
