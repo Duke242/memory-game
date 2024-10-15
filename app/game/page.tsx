@@ -201,6 +201,10 @@ const GamePage = () => {
               Your score:{" "}
               <span className="font-bold text-blue-600">{score} digits</span>
             </p>
+            <p className="text-xl mb-4 text-gray-500">
+              The average score is{" "}
+              <span className="font-bold text-blue-400">7 digits</span>
+            </p>
             <p className="text-xl mb-4">
               The correct number was:{" "}
               <span className="font-bold text-green-600">{currentNumber}</span>
