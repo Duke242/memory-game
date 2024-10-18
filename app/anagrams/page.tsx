@@ -124,9 +124,7 @@ const Anagrams: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex flex-col items-center justify-center p-4">
       <div className="bg-white bg-opacity-90 backdrop-blur-lg rounded-2xl shadow-2xl p-8 max-w-md w-full">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-extrabold text-blue-600">
-            Word Builder
-          </h1>
+          <h1 className="text-3xl font-extrabold text-blue-600">Anagrams</h1>
           <span className="text-xl font-bold text-purple-600">
             Score: {gameState.score}
           </span>
