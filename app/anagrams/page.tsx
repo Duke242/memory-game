@@ -1,6 +1,12 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
+import {
+  threeLetterWords,
+  fourLetterWords,
+  fiveLetterWords,
+  sixLetterWords,
+} from "./wordArrays"
 
 interface GameState {
   letters: string[]
@@ -9,9 +15,6 @@ interface GameState {
   message: string
   isCorrect: boolean
 }
-
-// Custom type guard for string array mapping
-type LetterFrequencyMap = Map<string, number>
 
 const Anagrams: React.FC = () => {
   // Common letters with weighted frequency
@@ -50,24 +53,41 @@ const Anagrams: React.FC = () => {
     getNewLetters()
   }, [])
 
-  const createFrequencyMap = (chars: string[]): LetterFrequencyMap => {
-    return chars.reduce((map: LetterFrequencyMap, char: string) => {
-      map.set(char, (map.get(char) || 0) + 1)
-      return map
-    }, new Map())
-  }
+  // const createFrequencyMap = (chars: string[]): LetterFrequencyMap => {
+  //   return chars.reduce((map: LetterFrequencyMap, char: string) => {
+  //     map.set(char, (map.get(char) || 0) + 1)
+  //     return map
+  //   }, new Map())
+  // }
+
+  // const checkWord = (word: string): boolean => {
+  //   const guessMap: LetterFrequencyMap = createFrequencyMap(word.split(""))
+  //   const lettersMap: LetterFrequencyMap = createFrequencyMap(gameState.letters)
+
+  //   for (const [char, count] of guessMap) {
+  //     if (!lettersMap.has(char) || lettersMap.get(char)! < count) {
+  //       return false
+  //     }
+  //   }
+
+  //   return true
+  // }
 
   const checkWord = (word: string): boolean => {
-    const guessMap: LetterFrequencyMap = createFrequencyMap(word.split(""))
-    const lettersMap: LetterFrequencyMap = createFrequencyMap(gameState.letters)
-
-    for (const [char, count] of guessMap) {
-      if (!lettersMap.has(char) || lettersMap.get(char)! < count) {
-        return false
-      }
+    const lowerCaseWord = word.toLowerCase()
+    if (lowerCaseWord.length === 3) {
+      return threeLetterWords.includes(lowerCaseWord)
     }
-
-    return true
+    if (lowerCaseWord.length === 4) {
+      return fourLetterWords.includes(lowerCaseWord)
+    }
+    if (lowerCaseWord.length === 5) {
+      return fiveLetterWords.includes(lowerCaseWord)
+    }
+    if (lowerCaseWord.length === 6) {
+      return sixLetterWords.includes(lowerCaseWord)
+    }
+    return false
   }
 
   // Simplified word validation - in production, use a dictionary API
@@ -103,7 +123,6 @@ const Anagrams: React.FC = () => {
         message: "Valid word! 🎉",
         isCorrect: true,
       }))
-      setTimeout(getNewLetters, 1500)
     } else {
       setGameState((prev) => ({
         ...prev,

@@ -1,5 +1,5 @@
 // prettier-ignore
-const threeLetterWords = [
+export const threeLetterWords = [
   "ace", "act", "add", "age", "ago", "aid", "aim", "air",
   "all", "and", "ant", "any", "ape", "apt", "arc", "are",
   "arm", "art", "ash", "ask", "ate", "bad", "bag", "ban",
@@ -37,7 +37,7 @@ const threeLetterWords = [
 ];
 
 // prettier-ignore
-const fourLetterWords = [
+export const fourLetterWords = [
   "able", "ache", "acid", "act", "aged", "aide", "aims", "air", "alarm",
   "also", "area", "army", "away", "baby", "back", "bail", "bait", "bake",
   "ball", "band", "bang", "bank", "bare", "bark", "barn", "base", "bath",
@@ -112,7 +112,7 @@ const fourLetterWords = [
 ];
 
 // prettier-ignore
-const fiveLetterWords = [
+export const fiveLetterWords = [
   "about", "above", "abuse", "actor", "acute", "admit", "adopt", "adult", "after", "again",
   "agent", "agree", "ahead", "alarm", "album", "alert", "alike", "alive", "allow", "alone",
   "along", "alter", "among", "anger", "angle", "angry", "apart", "apple", "apply", "arena",
@@ -166,7 +166,7 @@ const fiveLetterWords = [
 ];
 
 // prettier-ignore
-const sixLetterWords = [
+export const sixLetterWords = [
   "abroad", "accept", "access", "across", "acting", "action", "active", "actual", "advice",
   "advise", "affect", "afford", "afraid", "agency", "agenda", "almost", "always", "amount",
   "animal", "annual", "answer", "anyone", "anyway", "appeal", "appear", "around", "arrive",
