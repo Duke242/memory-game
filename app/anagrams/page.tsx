@@ -157,7 +157,7 @@ const Anagrams: React.FC = () => {
                   key={index}
                   className="w-12 h-12 bg-blue-200 rounded-lg flex items-center justify-center text-2xl font-bold text-blue-800 transform hover:scale-110 transition-transform"
                 >
-                  {letter}
+                  {letter.toUpperCase()}
                 </div>
               ))}
           </div>
