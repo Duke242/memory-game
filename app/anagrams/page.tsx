@@ -10,7 +10,7 @@ import {
 import { anagrams } from "./lettersAndWords"
 
 interface GameState {
-  letters: string[]
+  letters: string
   userGuess: string
   score: number
   message: string
@@ -24,7 +24,7 @@ const Anagrams: React.FC = () => {
   )
 
   const [gameState, setGameState] = useState<GameState>({
-    letters: [],
+    letters: Object.keys(anagrams)[0],
     userGuess: "",
     score: 0,
     message: "",
@@ -43,7 +43,6 @@ const Anagrams: React.FC = () => {
   const getNewLetters = (): void => {
     setGameState((prev) => ({
       ...prev,
-      letters: generateLetters(),
       userGuess: "",
       message: "",
       isCorrect: false,
@@ -77,16 +76,24 @@ const Anagrams: React.FC = () => {
   const checkWord = (word: string): boolean => {
     const lowerCaseWord = word.toLowerCase()
     if (lowerCaseWord.length === 3) {
-      return threeLetterWords.includes(lowerCaseWord)
+      return Object.values(anagrams).some((words) =>
+        words.includes(lowerCaseWord)
+      )
     }
     if (lowerCaseWord.length === 4) {
-      return fourLetterWords.includes(lowerCaseWord)
+      return Object.values(anagrams).some((words) =>
+        words.includes(lowerCaseWord)
+      )
     }
     if (lowerCaseWord.length === 5) {
-      return fiveLetterWords.includes(lowerCaseWord)
+      return Object.values(anagrams).some((words) =>
+        words.includes(lowerCaseWord)
+      )
     }
     if (lowerCaseWord.length === 6) {
-      return sixLetterWords.includes(lowerCaseWord)
+      return Object.values(anagrams).some((words) =>
+        words.includes(lowerCaseWord)
+      )
     }
     return false
   }
@@ -111,7 +118,7 @@ const Anagrams: React.FC = () => {
     if (!checkWord(guess)) {
       setGameState((prev) => ({
         ...prev,
-        message: "Use only the available letters! 🚫",
+        message: "Word not found in the list of valid anagrams! 🔍",
         isCorrect: false,
       }))
       return
@@ -155,14 +162,16 @@ const Anagrams: React.FC = () => {
             Make words using these letters:
           </p>
           <div className="flex flex-wrap justify-center gap-2 mt-2">
-            {gameState.letters.map((letter: string, index: number) => (
-              <div
-                key={index}
-                className="w-12 h-12 bg-blue-200 rounded-lg flex items-center justify-center text-2xl font-bold text-blue-800 transform hover:scale-110 transition-transform"
-              >
-                {letter}
-              </div>
-            ))}
+            {gameState.letters
+              .split("")
+              .map((letter: string, index: number) => (
+                <div
+                  key={index}
+                  className="w-12 h-12 bg-blue-200 rounded-lg flex items-center justify-center text-2xl font-bold text-blue-800 transform hover:scale-110 transition-transform"
+                >
+                  {letter}
+                </div>
+              ))}
           </div>
         </div>
 
