@@ -7,6 +7,7 @@ import {
   fiveLetterWords,
   sixLetterWords,
 } from "./wordArrays"
+import { anagrams } from "./lettersAndWords"
 
 interface GameState {
   letters: string[]
