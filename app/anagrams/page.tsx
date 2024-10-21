@@ -18,21 +18,15 @@ const Anagrams: React.FC = () => {
   )
 
   const [gameState, setGameState] = useState<GameState>({
-    letters: Object.keys(anagrams)[0],
+    letters:
+      Object.keys(anagrams)[
+        Math.floor(Math.random() * Object.keys(anagrams).length)
+      ],
     userGuess: "",
     score: 0,
     message: "",
     isCorrect: false,
   })
-
-  const generateLetters = (): string[] => {
-    const newLetters: string[] = []
-    for (let i = 0; i < 6; i++) {
-      const randomIndex: number = Math.floor(Math.random() * LETTERS.length)
-      newLetters.push(LETTERS[randomIndex])
-    }
-    return newLetters
-  }
 
   const getNewLetters = (): void => {
     setGameState((prev) => ({
