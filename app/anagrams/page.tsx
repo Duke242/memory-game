@@ -1,12 +1,6 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import {
-  threeLetterWords,
-  fourLetterWords,
-  fiveLetterWords,
-  sixLetterWords,
-} from "./wordArrays"
 import { anagrams } from "./lettersAndWords"
 
 interface GameState {
