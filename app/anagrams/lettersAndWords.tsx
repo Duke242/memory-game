@@ -24,6 +24,7 @@ export const anagrams = {
     "reinal",
     "realia",
     "learn",
+    "line",
     "liner",
     "renal",
     "alien",

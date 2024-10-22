@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react"
 import { anagrams } from "./lettersAndWords"
+import Link from "next/link"
+import { GiBrain } from "react-icons/gi"
 
 interface GameState {
   letters: string
@@ -12,73 +14,42 @@ interface GameState {
 }
 
 const Anagrams: React.FC = () => {
-  // Common letters with weighted frequency
-  const LETTERS: readonly string[] = Array.from(
-    "EEEEEEAAAAAAIIIIIOOOOOONNNNRRRRTTTTLLSSSSUUUDDGGBBCCMMPPFFHHVVWWYYKJXQZ"
-  )
+  // Use null as initial state
+  const [gameState, setGameState] = useState<GameState | null>(null)
 
-  const [gameState, setGameState] = useState<GameState>({
-    letters:
-      Object.keys(anagrams)[
-        Math.floor(Math.random() * Object.keys(anagrams).length)
-      ],
-    userGuess: "",
-    score: 0,
-    message: "",
-    isCorrect: false,
-  })
+  // Initialize game state after component mounts
+  useEffect(() => {
+    const initialState: GameState = {
+      letters:
+        Object.keys(anagrams)[
+          Math.floor(Math.random() * Object.keys(anagrams).length)
+        ],
+      userGuess: "",
+      score: 0,
+      message: "",
+      isCorrect: false,
+    }
+    setGameState(initialState)
+  }, [])
 
   const getNewLetters = (): void => {
+    if (!gameState) return
+
     setGameState((prev) => ({
-      ...prev,
+      ...prev!,
+      letters:
+        Object.keys(anagrams)[
+          Math.floor(Math.random() * Object.keys(anagrams).length)
+        ],
       userGuess: "",
       message: "",
       isCorrect: false,
     }))
   }
 
-  useEffect(() => {
-    getNewLetters()
-  }, [])
-
-  // const createFrequencyMap = (chars: string[]): LetterFrequencyMap => {
-  //   return chars.reduce((map: LetterFrequencyMap, char: string) => {
-  //     map.set(char, (map.get(char) || 0) + 1)
-  //     return map
-  //   }, new Map())
-  // }
-
-  // const checkWord = (word: string): boolean => {
-  //   const guessMap: LetterFrequencyMap = createFrequencyMap(word.split(""))
-  //   const lettersMap: LetterFrequencyMap = createFrequencyMap(gameState.letters)
-
-  //   for (const [char, count] of guessMap) {
-  //     if (!lettersMap.has(char) || lettersMap.get(char)! < count) {
-  //       return false
-  //     }
-  //   }
-
-  //   return true
-  // }
-
   const checkWord = (word: string): boolean => {
     const lowerCaseWord = word.toLowerCase()
-    if (lowerCaseWord.length === 3) {
-      return Object.values(anagrams).some((words) =>
-        words.includes(lowerCaseWord)
-      )
-    }
-    if (lowerCaseWord.length === 4) {
-      return Object.values(anagrams).some((words) =>
-        words.includes(lowerCaseWord)
-      )
-    }
-    if (lowerCaseWord.length === 5) {
-      return Object.values(anagrams).some((words) =>
-        words.includes(lowerCaseWord)
-      )
-    }
-    if (lowerCaseWord.length === 6) {
+    if (lowerCaseWord.length >= 3 && lowerCaseWord.length <= 6) {
       return Object.values(anagrams).some((words) =>
         words.includes(lowerCaseWord)
       )
@@ -86,17 +57,18 @@ const Anagrams: React.FC = () => {
     return false
   }
 
-  // Simplified word validation - in production, use a dictionary API
   const isValidWord = (word: string): boolean => {
     return word.length >= 3 && word.length <= 6
   }
 
   const handleSubmit = (): void => {
+    if (!gameState) return
+
     const guess: string = gameState.userGuess.toUpperCase()
 
     if (guess.length < 3) {
       setGameState((prev) => ({
-        ...prev,
+        ...prev!,
         message: "Word must be at least 3 letters long! 📏",
         isCorrect: false,
       }))
@@ -105,7 +77,7 @@ const Anagrams: React.FC = () => {
 
     if (!checkWord(guess)) {
       setGameState((prev) => ({
-        ...prev,
+        ...prev!,
         message: "Word not found in the list of valid anagrams! 🔍",
         isCorrect: false,
       }))
@@ -114,14 +86,14 @@ const Anagrams: React.FC = () => {
 
     if (isValidWord(guess)) {
       setGameState((prev) => ({
-        ...prev,
-        score: prev.score + guess.length,
+        ...prev!,
+        score: prev!.score + guess.length,
         message: "Valid word! 🎉",
         isCorrect: true,
       }))
     } else {
       setGameState((prev) => ({
-        ...prev,
+        ...prev!,
         message: "Not a valid word! 🤔",
         isCorrect: false,
       }))
@@ -129,14 +101,38 @@ const Anagrams: React.FC = () => {
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    if (!gameState) return
+
     setGameState((prev) => ({
-      ...prev,
+      ...prev!,
       userGuess: e.target.value.toUpperCase(),
     }))
   }
 
+  // Show loading state while initializing
+  if (!gameState) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center">
+        <div className="bg-white bg-opacity-90 backdrop-blur-lg rounded-2xl shadow-2xl p-8">
+          <p className="text-xl font-bold text-blue-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex flex-col items-center justify-center p-4">
+      <header className="w-full max-w-4xl mx-auto px-4 py-6 mb-8">
+        <nav className="flex justify-between items-center">
+          <Link
+            href="/"
+            className="text-2xl font-bold text-white flex items-center"
+          >
+            <GiBrain className="mr-2 text-3xl" />
+            MemoryMaster
+          </Link>
+        </nav>
+      </header>
       <div className="bg-white bg-opacity-90 backdrop-blur-lg rounded-2xl shadow-2xl p-8 max-w-md w-full">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-extrabold text-blue-600">Anagrams</h1>
