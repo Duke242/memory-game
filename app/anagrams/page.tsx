@@ -14,6 +14,7 @@ interface GameState {
   isCorrect: boolean
   timeLeft: number
   isGameActive: boolean
+  hasStarted: boolean
 }
 
 const Anagrams: React.FC = () => {
@@ -31,13 +32,14 @@ const Anagrams: React.FC = () => {
       isCorrect: false,
       timeLeft: 60,
       isGameActive: true,
+      hasStarted: false,
     }
     setGameState(initialState)
   }, [])
 
-  // Timer effect
+  // Modified timer effect to start when hasStarted is true
   useEffect(() => {
-    if (!gameState?.isGameActive) return
+    if (!gameState?.isGameActive || !gameState?.hasStarted) return
 
     const timer = setInterval(() => {
       setGameState((prev) => {
@@ -60,7 +62,7 @@ const Anagrams: React.FC = () => {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [gameState?.isGameActive])
+  }, [gameState?.isGameActive, gameState?.hasStarted])
 
   const startNewGame = (): void => {
     const newState: GameState = {
@@ -74,6 +76,7 @@ const Anagrams: React.FC = () => {
       isCorrect: false,
       timeLeft: 60,
       isGameActive: true,
+      hasStarted: false,
     }
     setGameState(newState)
   }
@@ -137,6 +140,7 @@ const Anagrams: React.FC = () => {
           color: "#166534",
         },
       })
+
       setGameState((prev) => ({
         ...prev!,
         score: prev!.score + guess.length,
@@ -163,10 +167,28 @@ const Anagrams: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     if (!gameState || !gameState.isGameActive) return
 
-    setGameState((prev) => ({
-      ...prev!,
-      userGuess: e.target.value.toUpperCase(),
-    }))
+    const newValue = e.target.value.toUpperCase()
+
+    // Start the timer on first character input
+    if (newValue.length === 1 && !gameState.hasStarted) {
+      toast.success("Timer started! Good luck! ⏱️", {
+        duration: 2000,
+        style: {
+          background: "#DCFCE7",
+          color: "#166534",
+        },
+      })
+      setGameState((prev) => ({
+        ...prev!,
+        userGuess: newValue,
+        hasStarted: true,
+      }))
+    } else {
+      setGameState((prev) => ({
+        ...prev!,
+        userGuess: newValue,
+      }))
+    }
   }
 
   if (!gameState) {
@@ -225,13 +247,15 @@ const Anagrams: React.FC = () => {
           type="text"
           value={gameState.userGuess}
           onChange={handleInputChange}
-          placeholder="Enter a 3-6 letter word"
+          placeholder="Type to start the game!"
           className="w-full p-2 border border-gray-300 rounded-md mb-4"
           maxLength={6}
           disabled={!gameState.isGameActive}
         />
         <span className="flex text-lg font-semibold text-gray-600 mb-4 justify-center text-purple-500">
-          Time: {gameState.timeLeft}s
+          {!gameState.hasStarted
+            ? "Type your first letter to start the timer!"
+            : `Time: ${gameState.timeLeft}s`}
         </span>
 
         <div className="space-y-4">
