@@ -182,7 +182,7 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
         {gameState === "recall" && (
           <div>
             <h2 className="text-2xl font-bold mb-6 text-blue-600">
-              Select the boxes you remember being blue:
+              Select the blue boxes:
             </h2>
             {renderGrid(userSelection)}
             <button
