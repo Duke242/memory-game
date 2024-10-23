@@ -9,7 +9,7 @@ export default function Page() {
       <header className="container mx-auto px-4 py-6">
         <nav className="flex justify-between items-center">
           <Link href="/" className="text-2xl font-bold flex items-center">
-            <GiBrain className="mr-2 text-3xl" />
+            <GiBrain className="mr-2 text-2xl" />
             MemoryMaster
           </Link>
           {/* <Link
@@ -23,8 +23,8 @@ export default function Page() {
 
       <main className="container mx-auto px-4 py-16">
         <div className="flex flex-col md:flex-row items-center justify-between">
-          <div className="md:w-1/2 mb-12 md:mb-0 animate-fade-in-up">
-            <h1 className="text-5xl md:text-6xl font-extrabold mb-6 leading-tight">
+          <div className="md:w-fit mb-12 md:mb-0 animate-fade-in-up">
+            <h1 className="text-5xl md:text-5xl font-extrabold mb-6 leading-tight">
               Unlock Your Brain&apos;s Potential
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-blue-100">
