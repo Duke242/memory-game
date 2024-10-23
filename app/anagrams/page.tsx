@@ -235,7 +235,7 @@ const Anagrams: React.FC = () => {
               .map((letter: string, index: number) => (
                 <div
                   key={index}
-                  className="w-12 h-12 bg-blue-200 rounded-lg flex items-center justify-center text-2xl font-bold text-blue-800 transform hover:scale-110 transition-transform"
+                  className="w-9 h-9 bg-blue-200 rounded-lg flex items-center justify-center text-2xl font-bold text-blue-800 transform hover:scale-110 transition-transform md:w-12 md:h-12"
                 >
                   {letter.toUpperCase()}
                 </div>
