@@ -44,6 +44,12 @@ export default function Page() {
               >
                 Play Box Memory
               </Link>
+              <Link
+                href="/anagrams"
+                className="inline-block text-blue-600 hover:bg-blue-100 bg-white font-bold text-lg px-8 py-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg text-center"
+              >
+                Play Anagrams
+              </Link>
             </div>
           </div>
           <div className="md:w-1/2 flex justify-center animate-fade-in">
