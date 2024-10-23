@@ -17,7 +17,7 @@ interface GameState {
   timeLeft: number
   isGameActive: boolean
   hasStarted: boolean
-  usedWords: Set<string> // Added this field
+  usedWords: Set<string>
 }
 
 const Anagrams: React.FC = () => {
@@ -47,10 +47,26 @@ const Anagrams: React.FC = () => {
       timeLeft: 60,
       isGameActive: true,
       hasStarted: false,
-      usedWords: new Set<string>(), // Initialize empty set
+      usedWords: new Set<string>(),
     }
     setGameState(initialState)
   }, [])
+
+  // Add keyboard event listener
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === "Enter" && gameState?.isGameActive) {
+        handleSubmit()
+      }
+    }
+
+    window.addEventListener("keypress", handleKeyPress)
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("keypress", handleKeyPress)
+    }
+  }, [gameState]) // Re-add listener when gameState changes
 
   useEffect(() => {
     if (!gameState?.isGameActive || !gameState?.hasStarted) return
@@ -102,7 +118,7 @@ const Anagrams: React.FC = () => {
       timeLeft: 60,
       isGameActive: true,
       hasStarted: false,
-      usedWords: new Set<string>(), // Reset used words for new game
+      usedWords: new Set<string>(),
     }
     setGameState(newState)
   }
@@ -140,6 +156,9 @@ const Anagrams: React.FC = () => {
     if (!gameState || !gameState.isGameActive) return
 
     const guess: string = gameState.userGuess.toUpperCase()
+
+    // If the guess is empty, don't process it
+    if (!guess.trim()) return
 
     // Check if word has already been used
     if (gameState.usedWords.has(guess)) {
@@ -207,7 +226,7 @@ const Anagrams: React.FC = () => {
         message: "Correct! 🎉",
         isCorrect: true,
         userGuess: "",
-        usedWords: new Set([...prev!.usedWords, guess]), // Add word to used words set
+        usedWords: new Set([...prev!.usedWords, guess]),
       }))
     } else {
       toast.error("Incorrect word! 🤔", {
