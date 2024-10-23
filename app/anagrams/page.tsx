@@ -293,8 +293,9 @@ const Anagrams: React.FC = () => {
         </div>
 
         <p className="mt-4 text-sm text-gray-600 text-center">
-          Make words of 3-6 letters. Points: 3️⃣=100pts, 4️⃣=400pts, 5️⃣=1200pts,
-          6️⃣=2000pts!
+          Make words of 3-6 letters.
+          <br />
+          Points: 3️⃣=100pts, 4️⃣=400pts, 5️⃣=1200pts, 6️⃣=2000pts!
         </p>
       </div>
     </div>
