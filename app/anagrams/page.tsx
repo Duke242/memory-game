@@ -4,10 +4,12 @@ import React, { useState, useEffect } from "react"
 import { anagrams } from "./lettersAndWords"
 import Link from "next/link"
 import { GiBrain } from "react-icons/gi"
+import { RiShuffleLine } from "react-icons/ri"
 import toast, { Toaster } from "react-hot-toast"
 
 interface GameState {
   letters: string
+  shuffledLetters: string
   userGuess: string
   score: number
   message: string
@@ -20,12 +22,23 @@ interface GameState {
 const Anagrams: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null)
 
+  const shuffleLetters = (letters: string): string => {
+    const array = letters.split("")
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[array[i], array[j]] = [array[j], array[i]]
+    }
+    return array.join("")
+  }
+
   useEffect(() => {
+    const initialLetters =
+      Object.keys(anagrams)[
+        Math.floor(Math.random() * Object.keys(anagrams).length)
+      ]
     const initialState: GameState = {
-      letters:
-        Object.keys(anagrams)[
-          Math.floor(Math.random() * Object.keys(anagrams).length)
-        ],
+      letters: initialLetters,
+      shuffledLetters: shuffleLetters(initialLetters),
       userGuess: "",
       score: 0,
       message: "",
@@ -37,7 +50,6 @@ const Anagrams: React.FC = () => {
     setGameState(initialState)
   }, [])
 
-  // Modified timer effect to start when hasStarted is true
   useEffect(() => {
     if (!gameState?.isGameActive || !gameState?.hasStarted) return
 
@@ -64,12 +76,23 @@ const Anagrams: React.FC = () => {
     return () => clearInterval(timer)
   }, [gameState?.isGameActive, gameState?.hasStarted])
 
+  const handleShuffle = (): void => {
+    if (!gameState || !gameState.isGameActive) return
+
+    setGameState((prev) => ({
+      ...prev!,
+      shuffledLetters: shuffleLetters(prev!.letters),
+    }))
+  }
+
   const startNewGame = (): void => {
+    const newLetters =
+      Object.keys(anagrams)[
+        Math.floor(Math.random() * Object.keys(anagrams).length)
+      ]
     const newState: GameState = {
-      letters:
-        Object.keys(anagrams)[
-          Math.floor(Math.random() * Object.keys(anagrams).length)
-        ],
+      letters: newLetters,
+      shuffledLetters: shuffleLetters(newLetters),
       userGuess: "",
       score: 0,
       message: "",
@@ -185,7 +208,6 @@ const Anagrams: React.FC = () => {
 
     const newValue = e.target.value.toUpperCase()
 
-    // Start the timer on first character input
     if (newValue.length === 1 && !gameState.hasStarted) {
       setGameState((prev) => ({
         ...prev!,
@@ -235,11 +257,21 @@ const Anagrams: React.FC = () => {
         </div>
 
         <div className="mb-4">
-          <p className="text-lg font-semibold text-gray-700">
-            Make words using these letters:
-          </p>
+          <div className="flex justify-between items-center mb-2">
+            <p className="text-lg font-semibold text-gray-700">
+              Make words using these letters:
+            </p>
+            <button
+              onClick={handleShuffle}
+              className="p-2 text-blue-600 hover:text-blue-800 transition-colors"
+              disabled={!gameState.isGameActive}
+              title="Shuffle Letters"
+            >
+              <RiShuffleLine className="w-6 h-6" />
+            </button>
+          </div>
           <div className="flex flex-wrap justify-center gap-2 mt-2">
-            {gameState.letters
+            {gameState.shuffledLetters
               .split("")
               .map((letter: string, index: number) => (
                 <div
