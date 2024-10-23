@@ -187,13 +187,6 @@ const Anagrams: React.FC = () => {
 
     // Start the timer on first character input
     if (newValue.length === 1 && !gameState.hasStarted) {
-      toast.success("Timer started! Good luck! ⏱️", {
-        duration: 2000,
-        style: {
-          background: "#DCFCE7",
-          color: "#166534",
-        },
-      })
       setGameState((prev) => ({
         ...prev!,
         userGuess: newValue,
