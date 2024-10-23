@@ -91,6 +91,21 @@ const Anagrams: React.FC = () => {
     return false
   }
 
+  const getWordScore = (length: number): number => {
+    switch (length) {
+      case 3:
+        return 100
+      case 4:
+        return 400
+      case 5:
+        return 1200
+      case 6:
+        return 2000
+      default:
+        return 0
+    }
+  }
+
   const isValidWord = (word: string): boolean => {
     return word.length >= 3 && word.length <= 6
   }
@@ -133,7 +148,8 @@ const Anagrams: React.FC = () => {
     }
 
     if (isValidWord(guess)) {
-      toast.success(`${guess} is correct!`, {
+      const pointsEarned = getWordScore(guess.length)
+      toast.success(`${guess} is correct! +${pointsEarned} points!`, {
         duration: 2000,
         style: {
           background: "#DCFCE7",
@@ -143,7 +159,7 @@ const Anagrams: React.FC = () => {
 
       setGameState((prev) => ({
         ...prev!,
-        score: prev!.score + guess.length,
+        score: prev!.score + pointsEarned,
         message: "Correct! 🎉",
         isCorrect: true,
         userGuess: "",
@@ -277,7 +293,8 @@ const Anagrams: React.FC = () => {
         </div>
 
         <p className="mt-4 text-sm text-gray-600 text-center">
-          Make words of 3-6 letters. Score points based on word length!
+          Make words of 3-6 letters. Points: 3️⃣=100pts, 4️⃣=400pts, 5️⃣=1200pts,
+          6️⃣=2000pts!
         </p>
       </div>
     </div>
