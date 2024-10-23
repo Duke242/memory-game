@@ -17,6 +17,7 @@ interface GameState {
   timeLeft: number
   isGameActive: boolean
   hasStarted: boolean
+  usedWords: Set<string> // Added this field
 }
 
 const Anagrams: React.FC = () => {
@@ -46,6 +47,7 @@ const Anagrams: React.FC = () => {
       timeLeft: 60,
       isGameActive: true,
       hasStarted: false,
+      usedWords: new Set<string>(), // Initialize empty set
     }
     setGameState(initialState)
   }, [])
@@ -100,6 +102,7 @@ const Anagrams: React.FC = () => {
       timeLeft: 60,
       isGameActive: true,
       hasStarted: false,
+      usedWords: new Set<string>(), // Reset used words for new game
     }
     setGameState(newState)
   }
@@ -137,6 +140,24 @@ const Anagrams: React.FC = () => {
     if (!gameState || !gameState.isGameActive) return
 
     const guess: string = gameState.userGuess.toUpperCase()
+
+    // Check if word has already been used
+    if (gameState.usedWords.has(guess)) {
+      toast.error("You've already used this word! 🔄", {
+        duration: 2000,
+        style: {
+          background: "#FEE2E2",
+          color: "#991B1B",
+        },
+      })
+      setGameState((prev) => ({
+        ...prev!,
+        message: "Word already used! 🔄",
+        isCorrect: false,
+        userGuess: "",
+      }))
+      return
+    }
 
     if (guess.length < 3) {
       toast.error("Word must be at least 3 letters long! 📏", {
@@ -186,6 +207,7 @@ const Anagrams: React.FC = () => {
         message: "Correct! 🎉",
         isCorrect: true,
         userGuess: "",
+        usedWords: new Set([...prev!.usedWords, guess]), // Add word to used words set
       }))
     } else {
       toast.error("Incorrect word! 🤔", {
@@ -252,6 +274,9 @@ const Anagrams: React.FC = () => {
           <div className="flex flex-col items-end">
             <span className="text-xl font-bold text-purple-600">
               Score: {gameState.score}
+            </span>
+            <span className="text-sm text-gray-600">
+              Words found: {gameState.usedWords.size}
             </span>
           </div>
         </div>
