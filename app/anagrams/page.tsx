@@ -20,6 +20,31 @@ interface GameState {
   usedWords: Set<string>
 }
 
+const AnimatedScore = ({ value }: { value: number }) => {
+  const [displayed, setDisplayed] = useState(value)
+  const [scale, setScale] = useState(1)
+
+  useEffect(() => {
+    if (value !== displayed) {
+      setScale(1.5)
+      setTimeout(() => setScale(1), 100)
+      setDisplayed(value)
+    }
+  }, [value, displayed])
+
+  return (
+    <span
+      className="inline-block transition-transform duration-300"
+      style={{
+        transform: `scale(${scale})`,
+        color: scale > 1 ? "#4C1D95" : undefined,
+      }}
+    >
+      {displayed.toLocaleString()}
+    </span>
+  )
+}
+
 const Anagrams: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null)
 
@@ -52,7 +77,6 @@ const Anagrams: React.FC = () => {
     setGameState(initialState)
   }, [])
 
-  // Add keyboard event listener
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === "Enter" && gameState?.isGameActive) {
@@ -62,11 +86,10 @@ const Anagrams: React.FC = () => {
 
     window.addEventListener("keypress", handleKeyPress)
 
-    // Cleanup
     return () => {
       window.removeEventListener("keypress", handleKeyPress)
     }
-  }, [gameState]) // Re-add listener when gameState changes
+  }, [gameState])
 
   useEffect(() => {
     if (!gameState?.isGameActive || !gameState?.hasStarted) return
@@ -157,10 +180,8 @@ const Anagrams: React.FC = () => {
 
     const guess: string = gameState.userGuess.toUpperCase()
 
-    // If the guess is empty, don't process it
     if (!guess.trim()) return
 
-    // Check if word has already been used
     if (gameState.usedWords.has(guess)) {
       toast.error("You've already used this word! 🔄", {
         duration: 2000,
@@ -292,7 +313,7 @@ const Anagrams: React.FC = () => {
           <h1 className="text-3xl font-extrabold text-blue-600">Anagrams</h1>
           <div className="flex flex-col items-end">
             <span className="text-xl font-bold text-purple-600">
-              Score: {gameState.score}
+              Score: <AnimatedScore value={gameState.score} />
             </span>
             <span className="text-sm text-gray-600">
               Words found: {gameState.usedWords.size}
