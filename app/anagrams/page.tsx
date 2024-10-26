@@ -331,7 +331,7 @@ const Anagrams: React.FC = () => {
           onChange={handleInputChange}
           placeholder="Type to start the game!"
           className="w-full p-2 border border-gray-300 rounded-md mb-4"
-          maxLength={6}
+          maxLength={7}
           disabled={!gameState.isGameActive}
         />
         <span className="flex text-lg font-semibold text-gray-600 mb-4 justify-center text-purple-500">
