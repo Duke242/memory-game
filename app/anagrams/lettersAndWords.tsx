@@ -259,6 +259,7 @@ export const anagrams = {
     "insect",
     "tonic",
     "stone",
+    "notice",
     "note",
     "icon",
     "coin",

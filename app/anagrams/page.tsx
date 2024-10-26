@@ -202,6 +202,7 @@ const Anagrams: React.FC = () => {
       setGameState((prev) => ({
         ...prev!,
         message: "Incorrect word! 🤔",
+        userGuess: "",
         isCorrect: false,
       }))
       return
