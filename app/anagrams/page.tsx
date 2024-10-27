@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { anagrams } from "./lettersAndWords"
 import Link from "next/link"
 import { GiBrain } from "react-icons/gi"
@@ -23,6 +23,7 @@ interface GameState {
 
 const Anagrams: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const shuffleLetters = (letters: string): string => {
     const array = letters.split("")
@@ -100,6 +101,7 @@ const Anagrams: React.FC = () => {
       ...prev!,
       shuffledLetters: shuffleLetters(prev!.letters),
     }))
+    inputRef.current?.focus()
   }
 
   const startNewGame = (): void => {
@@ -120,6 +122,9 @@ const Anagrams: React.FC = () => {
       usedWords: new Set<string>(),
     }
     setGameState(newState)
+    setTimeout(() => {
+      inputRef.current?.focus()
+    }, 0)
   }
 
   const checkWord = (word: string): boolean => {
@@ -172,6 +177,7 @@ const Anagrams: React.FC = () => {
         isCorrect: false,
         userGuess: "",
       }))
+      inputRef.current?.focus()
       return
     }
 
@@ -188,6 +194,7 @@ const Anagrams: React.FC = () => {
         message: "Word must be at least 3 letters long! 📏",
         isCorrect: false,
       }))
+      inputRef.current?.focus()
       return
     }
 
@@ -205,6 +212,7 @@ const Anagrams: React.FC = () => {
         userGuess: "",
         isCorrect: false,
       }))
+      inputRef.current?.focus()
       return
     }
 
@@ -226,6 +234,7 @@ const Anagrams: React.FC = () => {
         userGuess: "",
         usedWords: new Set([...prev!.usedWords, guess]),
       }))
+      inputRef.current?.focus()
     } else {
       toast.error("Incorrect word! 🤔", {
         duration: 2000,
@@ -239,6 +248,7 @@ const Anagrams: React.FC = () => {
         message: "Incorrect word! 🤔",
         isCorrect: false,
       }))
+      inputRef.current?.focus()
     }
   }
 
@@ -327,6 +337,7 @@ const Anagrams: React.FC = () => {
         </div>
 
         <input
+          ref={inputRef}
           type="text"
           value={gameState.userGuess}
           onChange={handleInputChange}
