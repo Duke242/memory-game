@@ -38,6 +38,7 @@ export const anagrams = {
     "plant",
     "panel",
     "penal",
+    "plane",
     "neat",
     "lane",
     "lean",
