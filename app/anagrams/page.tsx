@@ -87,6 +87,7 @@ const Anagrams: React.FC = () => {
 
     return () => clearInterval(timer)
   }, [gameState?.isGameActive, gameState?.hasStarted])
+
   const handleShuffle = (): void => {
     if (!gameState || !gameState.isGameActive) return
 
