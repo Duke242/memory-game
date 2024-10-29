@@ -13,7 +13,13 @@ const GameOverModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm transform transition-all">
+      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm transform transition-all relative">
+        <button
+          onClick={onPlayAgain}
+          className="absolute top-0 right-0 m-4 bg-red-500 text-white font-bold py-2 px-4 rounded-full hover:bg-red-600 transition duration-300 transform hover:scale-105"
+        >
+          X
+        </button>
         <div className="text-center">
           <h2 className="text-2xl font-bold text-blue-600 mb-4">Game Over!</h2>
 
