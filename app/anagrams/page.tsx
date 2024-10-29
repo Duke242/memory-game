@@ -7,6 +7,7 @@ import { GiBrain } from "react-icons/gi"
 import { RiShuffleLine } from "react-icons/ri"
 import toast, { Toaster } from "react-hot-toast"
 import AnimatedScore from "@/components/AnimatedScore"
+import GameOverModal from "@/components/GameOverModal"
 
 interface GameState {
   letters: string
@@ -78,13 +79,6 @@ const Anagrams: React.FC = () => {
         const newTimeLeft = prev.timeLeft - 1
         if (newTimeLeft <= 0) {
           clearInterval(timer)
-          toast.success(`Game Over! Final Score: ${prev.score}`, {
-            duration: 3000,
-            style: {
-              background: "#DCFCE7",
-              color: "#166534",
-            },
-          })
           return { ...prev, timeLeft: 0, isGameActive: false }
         }
         return { ...prev, timeLeft: newTimeLeft }
@@ -93,7 +87,6 @@ const Anagrams: React.FC = () => {
 
     return () => clearInterval(timer)
   }, [gameState?.isGameActive, gameState?.hasStarted])
-
   const handleShuffle = (): void => {
     if (!gameState || !gameState.isGameActive) return
 
@@ -376,6 +369,12 @@ const Anagrams: React.FC = () => {
           Points: 3️⃣=100pts, 4️⃣=400pts, 5️⃣=1200pts, 6️⃣=2000pts!
         </p>
       </div>
+      <GameOverModal
+        isOpen={!gameState.isGameActive}
+        score={gameState.score}
+        wordsFound={gameState.usedWords.size}
+        onPlayAgain={startNewGame}
+      />
     </div>
   )
 }
