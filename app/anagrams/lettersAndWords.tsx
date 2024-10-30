@@ -254,10 +254,7 @@ export const anagrams = {
     "par",
     "pay",
   ],
-  notices: [
-    "notices",
-    "section",
-    "insect",
+  notice: [
     "tonic",
     "stone",
     "notice",

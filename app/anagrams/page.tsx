@@ -20,6 +20,7 @@ interface GameState {
   isGameActive: boolean
   hasStarted: boolean
   usedWords: Set<string>
+  randomIndex: number
 }
 
 const Anagrams: React.FC = () => {
@@ -34,12 +35,14 @@ const Anagrams: React.FC = () => {
     }
     return array.join("")
   }
+  const getRandomIndex = () => {
+    return Math.floor(Math.random() * Object.keys(anagrams).length)
+  }
 
   useEffect(() => {
-    const initialLetters =
-      Object.keys(anagrams)[
-        Math.floor(Math.random() * Object.keys(anagrams).length)
-      ]
+    const randomIndex = getRandomIndex()
+    const initialLetters = Object.keys(anagrams)[randomIndex]
+    console.log({ initialLetters })
     const initialState: GameState = {
       letters: initialLetters,
       shuffledLetters: shuffleLetters(initialLetters),
@@ -51,6 +54,7 @@ const Anagrams: React.FC = () => {
       isGameActive: true,
       hasStarted: false,
       usedWords: new Set<string>(),
+      randomIndex,
     }
     setGameState(initialState)
   }, [])
@@ -99,13 +103,12 @@ const Anagrams: React.FC = () => {
   }
 
   const startNewGame = (): void => {
-    const newLetters =
-      Object.keys(anagrams)[
-        Math.floor(Math.random() * Object.keys(anagrams).length)
-      ]
+    const randomIndex = getRandomIndex()
+    const letters = Object.keys(anagrams)[randomIndex]
     const newState: GameState = {
-      letters: newLetters,
-      shuffledLetters: shuffleLetters(newLetters),
+      randomIndex,
+      letters,
+      shuffledLetters: shuffleLetters(letters),
       userGuess: "",
       score: 0,
       message: "",
@@ -123,10 +126,13 @@ const Anagrams: React.FC = () => {
 
   const checkWord = (word: string): boolean => {
     const lowerCaseWord = word.toLowerCase()
+    console.log({ gameState })
     if (lowerCaseWord.length >= 3 && lowerCaseWord.length <= 6) {
-      return Object.values(anagrams).some((words) =>
-        words.includes(lowerCaseWord)
-      )
+      const currentWordSetKey = Object.keys(anagrams)[gameState.randomIndex]
+      const currentWordList =
+        anagrams[currentWordSetKey as keyof typeof anagrams]
+      console.log(anagrams[currentWordSetKey as keyof typeof anagrams])
+      return currentWordList.includes(lowerCaseWord)
     }
     return false
   }
