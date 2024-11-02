@@ -2,6 +2,8 @@ import React from "react"
 import Link from "next/link"
 import { GiBrain } from "react-icons/gi"
 import BenefitsSection from "@/components/BenefitsSection"
+import Image from "next/image"
+import animationGif from "./anagrams-gif.gif"
 
 export default function Page() {
   return (
@@ -34,22 +36,31 @@ export default function Page() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/game"
-                className="inline-block bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-full hover:bg-blue-100 transition duration-300 transform hover:scale-105 shadow-lg text-center"
+                className="inline-block bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-full hover:bg-blue-100 transition duration-300 transform hover:scale-105 shadow-lg text-center h-fit"
               >
                 Play Number Memory
               </Link>
               <Link
                 href="/box-game"
-                className="inline-block text-blue-600 hover:bg-blue-100 bg-white font-bold text-lg px-8 py-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg text-center"
+                className="inline-block text-blue-600 hover:bg-blue-100 bg-white font-bold text-lg px-8 py-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg text-center h-fit"
               >
                 Play Box Memory
               </Link>
-              <Link
-                href="/anagrams"
-                className="inline-block text-blue-600 hover:bg-blue-100 bg-white font-bold text-lg px-8 py-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg text-center"
-              >
-                Play Anagrams
-              </Link>
+              <div className="flex flex-col group">
+                <Image
+                  src={animationGif}
+                  alt="Anagrams game demo"
+                  width={300}
+                  height={200}
+                  className="rounded-t w-full transition duration-300 group-hover:scale-105"
+                />
+                <Link
+                  href="/anagrams"
+                  className="w-full text-blue-600 hover:bg-blue-100 bg-white font-bold text-lg px-8 py-4 rounded-b transition duration-300 group-hover:scale-105 shadow-lg text-center"
+                >
+                  Play Anagrams
+                </Link>
+              </div>
             </div>
           </div>
           <div className="md:w-1/2 flex justify-center animate-fade-in">
