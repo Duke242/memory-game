@@ -252,7 +252,7 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
               onClick={() => setGameState("setup")}
               className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
             >
-              Try Again
+              Play Again
             </button>
           </div>
         )}
