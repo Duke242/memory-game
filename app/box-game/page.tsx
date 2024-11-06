@@ -17,6 +17,15 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
   const [timeRemaining, setTimeRemaining] = useState<number>(100)
   const [displayTime, setDisplayTime] = useState<number>(3)
   const [score, setScore] = useState<number>(0)
+  const [stats, setStats] = useState<{
+    correct: number
+    incorrect: number
+    missed: number
+  }>({
+    correct: 0,
+    incorrect: 0,
+    missed: 0,
+  })
 
   useEffect(() => {
     if (gameState === "display") {
@@ -57,14 +66,28 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
   }
 
   const handleSubmit = () => {
-    const correctCount = coloredBoxes.reduce(
-      (count, isColored, index) =>
-        count + (isColored === userSelection[index] ? 1 : 0),
-      0
-    )
-    const totalBoxes = difficulty * difficulty
-    const percentage = Math.round((correctCount / totalBoxes) * 100)
+    let correct = 0
+    let incorrect = 0
+    let missed = 0
+    const totalBlueBoxes = coloredBoxes.filter((box) => box).length
+
+    coloredBoxes.forEach((isColored, index) => {
+      if (isColored) {
+        if (userSelection[index]) {
+          correct++
+        } else {
+          missed++
+        }
+      } else {
+        if (userSelection[index]) {
+          incorrect++
+        }
+      }
+    })
+
+    const percentage = Math.round((correct / totalBlueBoxes) * 100)
     setScore(percentage)
+    setStats({ correct, incorrect, missed })
     setGameState("result")
   }
 
@@ -233,7 +256,12 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
               <p className="text-xl font-semibold text-gray-700 mb-2">
                 Score: {score}%
               </p>
-              <div className="flex items-center justify-center space-x-6 text-sm text-gray-600">
+              <div className="text-sm text-gray-600 space-y-1">
+                <p>Correct selections: {stats.correct}</p>
+                <p>Incorrect selections: {stats.incorrect}</p>
+                <p>Missed boxes: {stats.missed}</p>
+              </div>
+              <div className="flex items-center justify-center space-x-6 text-sm text-gray-600 mt-4">
                 <div className="flex items-center">
                   <div className="w-4 h-4 bg-green-200 rounded-md mr-2"></div>
                   <span>Correct</span>
