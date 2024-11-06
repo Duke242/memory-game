@@ -4,6 +4,8 @@ import { GiBrain } from "react-icons/gi"
 import BenefitsSection from "@/components/BenefitsSection"
 import Image from "next/image"
 import animationGif from "./anagrams-gif.gif"
+import numberGif from "./number-game.gif"
+import boxGameGif from "./box-game.gif"
 
 export default function Page() {
   return (
@@ -34,29 +36,56 @@ export default function Page() {
               memory games.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/game"
-                className="inline-block bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-full hover:bg-blue-100 transition duration-300 transform hover:scale-105 shadow-lg text-center h-fit"
-              >
-                Play Number Memory
-              </Link>
-              <Link
-                href="/box-game"
-                className="inline-block text-blue-600 hover:bg-blue-100 bg-white font-bold text-lg px-8 py-4 rounded-full transition duration-300 transform hover:scale-105 shadow-lg text-center h-fit"
-              >
-                Play Box Memory
-              </Link>
-              <div className="flex flex-col group">
-                <Image
-                  src={animationGif}
-                  alt="Anagrams game demo"
-                  width={300}
-                  height={200}
-                  className="rounded-t w-full transition duration-300 group-hover:scale-105"
-                />
+              <div className="flex flex-col group h-fit">
+                <div className="flex-1">
+                  <Image
+                    src={numberGif}
+                    alt="Number game demo"
+                    width={300}
+                    height={200}
+                    className="rounded-t w-full h-full object-cover transition duration-300 group-hover:scale-105"
+                    unoptimized={true}
+                  />
+                </div>
+                <Link
+                  href="/game"
+                  className="bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-b hover:bg-blue-100 transition duration-300 transform group-hover:scale-105 shadow-lg text-center"
+                >
+                  Play Number Game
+                </Link>
+              </div>
+              <div className="flex flex-col group h-fit">
+                <div className="flex-1">
+                  <Image
+                    src={boxGameGif}
+                    alt="Box game demo"
+                    width={300}
+                    height={200}
+                    className="rounded-t w-full h-full object-cover transition duration-300 group-hover:scale-105"
+                    unoptimized={true}
+                  />
+                </div>
+                <Link
+                  href="/box-game"
+                  className="bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-b hover:bg-blue-100 transition duration-300 transform group-hover:scale-105 shadow-lg text-center"
+                >
+                  Play Box Memory
+                </Link>
+              </div>
+              <div className="flex flex-col group h-fit">
+                <div className="flex-1">
+                  <Image
+                    src={animationGif}
+                    alt="Anagrams game demo"
+                    width={300}
+                    height={200}
+                    className="rounded-t w-full h-full object-cover transition duration-300 group-hover:scale-105"
+                    unoptimized={true}
+                  />
+                </div>
                 <Link
                   href="/anagrams"
-                  className="w-full text-blue-600 hover:bg-blue-100 bg-white font-bold text-lg px-8 py-4 rounded-b transition duration-300 group-hover:scale-105 shadow-lg text-center"
+                  className="bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-b hover:bg-blue-100 transition duration-300 transform group-hover:scale-105 shadow-lg text-center"
                 >
                   Play Anagrams
                 </Link>
