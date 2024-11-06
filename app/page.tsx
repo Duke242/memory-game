@@ -8,6 +8,27 @@ import numberGif from "./number-game.gif"
 import boxGameGif from "./box-game.gif"
 
 export default function Page() {
+  const games = [
+    {
+      title: "Number Game",
+      image: numberGif,
+      href: "/game",
+      alt: "Number game demo",
+    },
+    {
+      title: "Box Memory",
+      image: boxGameGif,
+      href: "/box-game",
+      alt: "Box game demo",
+    },
+    {
+      title: "Anagrams",
+      image: animationGif,
+      href: "/anagrams",
+      alt: "Anagrams game demo",
+    },
+  ]
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 text-white">
       <header className="container mx-auto px-4 py-6">
@@ -16,12 +37,6 @@ export default function Page() {
             <GiBrain className="mr-2 text-2xl" />
             MemoryMaster
           </Link>
-          {/* <Link
-            href="/login"
-            className="bg-white text-blue-600 px-4 py-2 rounded-full font-semibold hover:bg-opacity-90 transition duration-300"
-          >
-            Sign In
-          </Link> */}
         </nav>
       </header>
 
@@ -35,61 +50,26 @@ export default function Page() {
               Challenge your mind and improve your memory with our exciting
               memory games.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex flex-col group h-fit">
-                <div className="flex-1">
-                  <Image
-                    src={numberGif}
-                    alt="Number game demo"
-                    width={300}
-                    height={200}
-                    className="rounded-t w-full h-full object-cover transition duration-300 group-hover:scale-105"
-                    unoptimized={true}
-                  />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {games.map((game) => (
+                <div key={game.href} className="flex flex-col group h-full">
+                  <div className="relative w-full h-48">
+                    <Image
+                      src={game.image}
+                      alt={game.alt}
+                      fill
+                      className="rounded-t object-cover transition duration-300 group-hover:scale-105"
+                      unoptimized={true}
+                    />
+                  </div>
+                  <Link
+                    href={game.href}
+                    className="bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-b hover:bg-blue-100 transition duration-300 transform group-hover:scale-105 shadow-lg text-center"
+                  >
+                    Play {game.title}
+                  </Link>
                 </div>
-                <Link
-                  href="/game"
-                  className="bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-b hover:bg-blue-100 transition duration-300 transform group-hover:scale-105 shadow-lg text-center"
-                >
-                  Play Number Game
-                </Link>
-              </div>
-              <div className="flex flex-col group h-fit">
-                <div className="flex-1">
-                  <Image
-                    src={boxGameGif}
-                    alt="Box game demo"
-                    width={300}
-                    height={200}
-                    className="rounded-t w-full h-full object-cover transition duration-300 group-hover:scale-105"
-                    unoptimized={true}
-                  />
-                </div>
-                <Link
-                  href="/box-game"
-                  className="bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-b hover:bg-blue-100 transition duration-300 transform group-hover:scale-105 shadow-lg text-center"
-                >
-                  Play Box Memory
-                </Link>
-              </div>
-              <div className="flex flex-col group h-fit">
-                <div className="flex-1">
-                  <Image
-                    src={animationGif}
-                    alt="Anagrams game demo"
-                    width={300}
-                    height={200}
-                    className="rounded-t w-full h-full object-cover transition duration-300 group-hover:scale-105"
-                    unoptimized={true}
-                  />
-                </div>
-                <Link
-                  href="/anagrams"
-                  className="bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-b hover:bg-blue-100 transition duration-300 transform group-hover:scale-105 shadow-lg text-center"
-                >
-                  Play Anagrams
-                </Link>
-              </div>
+              ))}
             </div>
           </div>
           <div className="md:w-1/2 flex justify-center animate-fade-in">
