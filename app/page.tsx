@@ -52,7 +52,11 @@ export default function Page() {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {games.map((game) => (
-                <div key={game.href} className="flex flex-col group h-full">
+                <Link
+                  key={game.href}
+                  href={game.href}
+                  className="flex flex-col group h-full cursor-pointer"
+                >
                   <div className="relative w-full h-48 hidden md:block">
                     <Image
                       src={game.image}
@@ -62,13 +66,10 @@ export default function Page() {
                       unoptimized={true}
                     />
                   </div>
-                  <Link
-                    href={game.href}
-                    className="bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-full md:rounded-b md:rounded-t-none hover:bg-blue-100 transition duration-300 transform group-hover:scale-105 shadow-lg text-center"
-                  >
+                  <div className="bg-white text-blue-600 font-bold text-lg px-8 py-4 rounded-full md:rounded-b md:rounded-t-none hover:bg-blue-100 transition duration-300 transform group-hover:scale-105 shadow-lg text-center">
                     Play {game.title}
-                  </Link>
-                </div>
+                  </div>
+                </Link>
               ))}
             </div>
           </div>
