@@ -164,7 +164,7 @@ const Anagrams: React.FC = () => {
     if (!guess.trim()) return
 
     if (gameState.usedWords.has(guess)) {
-      toast.error("You've already used this word! 🔄", {
+      toast.error("You've already used this word!", {
         duration: 2000,
         style: {
           background: "#FEE2E2",
@@ -173,7 +173,7 @@ const Anagrams: React.FC = () => {
       })
       setGameState((prev) => ({
         ...prev!,
-        message: "Word already used! 🔄",
+        message: "Word already used!",
         isCorrect: false,
         userGuess: "",
       }))
@@ -182,7 +182,7 @@ const Anagrams: React.FC = () => {
     }
 
     if (guess.length < 3) {
-      toast.error("Word must be at least 3 letters long! 📏", {
+      toast.error("Word must be at least 3 letters long!", {
         duration: 2000,
         style: {
           background: "#FEE2E2",
@@ -191,7 +191,7 @@ const Anagrams: React.FC = () => {
       })
       setGameState((prev) => ({
         ...prev!,
-        message: "Word must be at least 3 letters long! 📏",
+        message: "Word must be at least 3 letters long!",
         isCorrect: false,
       }))
       inputRef.current?.focus()
@@ -199,7 +199,7 @@ const Anagrams: React.FC = () => {
     }
 
     if (!checkWord(guess)) {
-      toast.error("Incorrect word! 🤔", {
+      toast.error("Incorrect word!", {
         duration: 2000,
         style: {
           background: "#FEE2E2",
@@ -208,7 +208,7 @@ const Anagrams: React.FC = () => {
       })
       setGameState((prev) => ({
         ...prev!,
-        message: "Incorrect word! 🤔",
+        message: "Incorrect word!",
         userGuess: "",
         isCorrect: false,
       }))
@@ -236,7 +236,7 @@ const Anagrams: React.FC = () => {
       }))
       inputRef.current?.focus()
     } else {
-      toast.error("Incorrect word! 🤔", {
+      toast.error("Incorrect word!", {
         duration: 2000,
         style: {
           background: "#FEE2E2",
@@ -245,7 +245,7 @@ const Anagrams: React.FC = () => {
       })
       setGameState((prev) => ({
         ...prev!,
-        message: "Incorrect word! 🤔",
+        message: "Incorrect word!",
         isCorrect: false,
       }))
       inputRef.current?.focus()
