@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react"
 import { Check, X } from "lucide-react"
 import { GiBrain } from "react-icons/gi"
 import Link from "next/link"
+import toast from "react-hot-toast"
 
 type GameState = "setup" | "display" | "recall" | "result"
 
@@ -14,6 +15,7 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
   const [coloredBoxes, setColoredBoxes] = useState<boolean[]>([])
   const [userSelection, setUserSelection] = useState<boolean[]>([])
   const [difficulty, setDifficulty] = useState<number>(4)
+  const [numColoredBoxes, setNumColoredBoxes] = useState<number>(3)
   const [timeRemaining, setTimeRemaining] = useState<number>(100)
   const [displayTime, setDisplayTime] = useState<number>(3)
   const [score, setScore] = useState<number>(0)
@@ -27,11 +29,25 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
     missed: 0,
   })
 
+  const getMaxColoredBoxes = (gridSize: number) => {
+    return Math.min(Math.floor(gridSize * gridSize * 0.8), 20)
+  }
+
   useEffect(() => {
     if (gameState === "display") {
-      const newColoredBoxes = Array(difficulty * difficulty)
-        .fill(false)
-        .map(() => Math.random() < 0.5)
+      const newColoredBoxes = Array(difficulty * difficulty).fill(false)
+
+      let remainingBoxes = numColoredBoxes
+      while (remainingBoxes > 0) {
+        const randomIndex = Math.floor(
+          Math.random() * (difficulty * difficulty)
+        )
+        if (!newColoredBoxes[randomIndex]) {
+          newColoredBoxes[randomIndex] = true
+          remainingBoxes--
+        }
+      }
+
       setColoredBoxes(newColoredBoxes)
       setUserSelection(Array(difficulty * difficulty).fill(false))
       setTimeRemaining(100)
@@ -49,7 +65,7 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
 
       return () => clearInterval(timer)
     }
-  }, [gameState, difficulty, displayTime])
+  }, [gameState, difficulty, displayTime, numColoredBoxes])
 
   const handleStartGame = () => {
     setGameState("display")
@@ -69,7 +85,6 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
     let correct = 0
     let incorrect = 0
     let missed = 0
-    const totalBlueBoxes = coloredBoxes.filter((box) => box).length
 
     coloredBoxes.forEach((isColored, index) => {
       if (isColored) {
@@ -85,10 +100,39 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
       }
     })
 
-    const percentage = Math.round((correct / totalBlueBoxes) * 100)
+    const percentage = Math.round((correct / numColoredBoxes) * 100)
     setScore(percentage)
     setStats({ correct, incorrect, missed })
+
     setGameState("result")
+  }
+
+  const nextLevelPressed = () => {
+    let newDifficulty = difficulty
+    let newNumColoredBoxes = numColoredBoxes + 1
+
+    if (difficulty === 3 && numColoredBoxes >= 7) {
+      newDifficulty = 4
+    } else if (difficulty === 4 && numColoredBoxes >= 12) {
+      newDifficulty = 5
+    } else if (difficulty === 5 && numColoredBoxes >= 20) {
+      toast.success("Congratulations! You've beaten the highest level!", {
+        duration: 3000,
+        position: "top-center",
+        style: {
+          background: "#4CAF50",
+          color: "#fff",
+        },
+      })
+
+      setGameState("setup")
+      return
+    }
+
+    setDifficulty(newDifficulty)
+    setNumColoredBoxes(newNumColoredBoxes)
+
+    setGameState("display")
   }
 
   const renderGrid = (boxes: boolean[]) => {
@@ -177,7 +221,10 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
                 {[3, 4, 5].map((size) => (
                   <button
                     key={size}
-                    onClick={() => setDifficulty(size)}
+                    onClick={() => {
+                      setDifficulty(size)
+                      setNumColoredBoxes(Math.min(3, getMaxColoredBoxes(size)))
+                    }}
                     className={`py-2 px-4 rounded font-bold ${
                       difficulty === size
                         ? "bg-blue-600 text-white"
@@ -187,6 +234,24 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
                     {size}x{size}
                   </button>
                 ))}
+              </div>
+            </div>
+            <div className="mb-6">
+              <label className="block text-lg font-semibold text-gray-700 mb-3">
+                Number of colored boxes:
+              </label>
+              <div className="flex items-center space-x-4">
+                <input
+                  type="range"
+                  min={1}
+                  max={getMaxColoredBoxes(difficulty)}
+                  value={numColoredBoxes}
+                  onChange={(e) => setNumColoredBoxes(parseInt(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer"
+                />
+                <span className="text-xl font-bold text-blue-600">
+                  {numColoredBoxes}
+                </span>
               </div>
             </div>
             <div className="mb-6">
@@ -219,7 +284,7 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
         {gameState === "display" && (
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-6 text-blue-600">
-              Memorize the blue boxes:
+              Memorize blue boxes:
             </h2>
             {renderGrid(coloredBoxes)}
             <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
@@ -261,6 +326,12 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
                 <p>Incorrect selections: {stats.incorrect}</p>
                 <p>Missed boxes: {stats.missed}</p>
               </div>
+              {score === 100 && (
+                <p className="text-green-600 font-semibold mt-2">
+                  Great job! Next level will have {numColoredBoxes + 1} boxes to
+                  remember.
+                </p>
+              )}
               <div className="flex items-center justify-center space-x-6 text-sm text-gray-600 mt-4">
                 <div className="flex items-center">
                   <div className="w-4 h-4 bg-green-200 rounded-md mr-2"></div>
@@ -276,12 +347,21 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
                 </div>
               </div>
             </div>
-            <button
-              onClick={() => setGameState("setup")}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
-            >
-              Play Again
-            </button>
+            {score === 100 ? (
+              <button
+                onClick={nextLevelPressed}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
+              >
+                Next Level
+              </button>
+            ) : (
+              <button
+                onClick={() => setGameState("setup")}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
+              >
+                Play Again
+              </button>
+            )}
           </div>
         )}
       </div>
