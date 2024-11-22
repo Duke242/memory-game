@@ -14,6 +14,7 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
   const [coloredBoxes, setColoredBoxes] = useState<boolean[]>([])
   const [userSelection, setUserSelection] = useState<boolean[]>([])
   const [difficulty, setDifficulty] = useState<number>(4)
+  const [numColoredBoxes, setNumColoredBoxes] = useState<number>(3)
   const [timeRemaining, setTimeRemaining] = useState<number>(100)
   const [displayTime, setDisplayTime] = useState<number>(3)
   const [score, setScore] = useState<number>(0)
@@ -29,9 +30,19 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
 
   useEffect(() => {
     if (gameState === "display") {
-      const newColoredBoxes = Array(difficulty * difficulty)
-        .fill(false)
-        .map(() => Math.random() < 0.5)
+      const newColoredBoxes = Array(difficulty * difficulty).fill(false)
+
+      let remainingBoxes = numColoredBoxes
+      while (remainingBoxes > 0) {
+        const randomIndex = Math.floor(
+          Math.random() * (difficulty * difficulty)
+        )
+        if (!newColoredBoxes[randomIndex]) {
+          newColoredBoxes[randomIndex] = true
+          remainingBoxes--
+        }
+      }
+
       setColoredBoxes(newColoredBoxes)
       setUserSelection(Array(difficulty * difficulty).fill(false))
       setTimeRemaining(100)
@@ -49,7 +60,7 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
 
       return () => clearInterval(timer)
     }
-  }, [gameState, difficulty, displayTime])
+  }, [gameState, difficulty, displayTime, numColoredBoxes])
 
   const handleStartGame = () => {
     setGameState("display")
@@ -69,7 +80,6 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
     let correct = 0
     let incorrect = 0
     let missed = 0
-    const totalBlueBoxes = coloredBoxes.filter((box) => box).length
 
     coloredBoxes.forEach((isColored, index) => {
       if (isColored) {
@@ -85,9 +95,15 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
       }
     })
 
-    const percentage = Math.round((correct / totalBlueBoxes) * 100)
+    const percentage = Math.round((correct / numColoredBoxes) * 100)
     setScore(percentage)
     setStats({ correct, incorrect, missed })
+
+    // If perfect score, increase number of colored boxes for next round
+    if (percentage === 100) {
+      setNumColoredBoxes((prev) => prev + 1)
+    }
+
     setGameState("result")
   }
 
@@ -191,6 +207,24 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
             </div>
             <div className="mb-6">
               <label className="block text-lg font-semibold text-gray-700 mb-3">
+                Number of colored boxes:
+              </label>
+              <div className="flex items-center space-x-4">
+                <input
+                  type="range"
+                  min={1}
+                  max={Math.min(difficulty * difficulty - 1, 15)}
+                  value={numColoredBoxes}
+                  onChange={(e) => setNumColoredBoxes(parseInt(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer"
+                />
+                <span className="text-xl font-bold text-blue-600">
+                  {numColoredBoxes}
+                </span>
+              </div>
+            </div>
+            <div className="mb-6">
+              <label className="block text-lg font-semibold text-gray-700 mb-3">
                 Select display time:
               </label>
               <div className="flex items-center space-x-4">
@@ -219,7 +253,7 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
         {gameState === "display" && (
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-6 text-blue-600">
-              Memorize the blue boxes:
+              Memorize {numColoredBoxes} blue boxes:
             </h2>
             {renderGrid(coloredBoxes)}
             <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
@@ -234,7 +268,7 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
         {gameState === "recall" && (
           <div>
             <h2 className="text-2xl font-bold mb-6 text-blue-600">
-              Select the blue boxes:
+              Select the {numColoredBoxes} blue boxes:
             </h2>
             {renderGrid(userSelection)}
             <button
@@ -261,6 +295,12 @@ const BoxGamePage: React.FC<BoxGamePageProps> = () => {
                 <p>Incorrect selections: {stats.incorrect}</p>
                 <p>Missed boxes: {stats.missed}</p>
               </div>
+              {score === 100 && (
+                <p className="text-green-600 font-semibold mt-2">
+                  Great job! Next round will have {numColoredBoxes + 1} boxes to
+                  remember.
+                </p>
+              )}
               <div className="flex items-center justify-center space-x-6 text-sm text-gray-600 mt-4">
                 <div className="flex items-center">
                   <div className="w-4 h-4 bg-green-200 rounded-md mr-2"></div>
