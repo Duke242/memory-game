@@ -8,9 +8,7 @@ import toast from "react-hot-toast"
 
 type GameState = "setup" | "display" | "recall" | "result"
 
-interface BoxGamePageProps {}
-
-const BoxGamePage: React.FC<BoxGamePageProps> = () => {
+const BoxGamePage: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>("setup")
   const [coloredBoxes, setColoredBoxes] = useState<boolean[]>([])
   const [userSelection, setUserSelection] = useState<boolean[]>([])
