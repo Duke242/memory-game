@@ -1,60 +1,60 @@
-# Memory Challenge Games
+# MemoryMaster
 
-A collection of engaging games designed to test and improve your memory skills!
+A scientific approach to memory assessment and tracking.
 
 ## Games Overview
 
-This project includes three unique memory challenge games:
+MemoryMaster provides three precision memory challenge games designed to establish and track your memory baseline:
 
 ### 1. Number Memory Game
 
-Test your ability to remember and recall numerical sequences.
+Assess your numerical memory recall capabilities.
 
 #### Objective
-Memorize increasingly longer sequences of numbers and reproduce them accurately.
+Systematically measure your ability to remember and reproduce numerical sequences.
 
 #### How to Play
 1. A sequence of numbers will be displayed.
 2. Memorize the sequence within a limited time.
 3. Input the sequence you remember.
-4. Correctly recall the sequence to advance to the next level.
-5. Each correct round increases the difficulty.
+4. Consistently track your performance across repeated attempts.
+5. Establish a reliable memory baseline for numerical information.
 
 ### 2. Box Memorization Game
 
-Challenge your visual memory and spatial recall.
+Evaluate your visual and spatial memory performance.
 
 #### Objective
-Memorize the position and pattern of highlighted boxes within a grid.
+Precisely measure your ability to recall spatial patterns and box positions.
 
 #### How to Play
 1. A grid of boxes will briefly highlight a specific pattern.
 2. After the pattern disappears, reproduce the exact sequence of highlighted boxes.
-3. Correct recalls increase the grid size and complexity.
-4. Track your progress through increasingly difficult levels.
+3. Systematically record your ability to recall spatial information.
+4. Generate consistent metrics for visual memory performance.
 
 ### 3. Anagrams Game
 
-Test your word skills and mental flexibility.
+Measure cognitive flexibility and word recall.
 
 #### Objective
-Rearrange jumbled letters to form valid words.
+Assess your ability to manipulate and recall linguistic information.
 
 #### How to Play
 1. Receive a scrambled set of letters.
 2. Rearrange the letters to create meaningful words.
-3. Race against the clock to find as many words as possible.
-4. Earn points for each correct word discovered.
+3. Track your performance in word generation and recall.
+4. Generate metrics for linguistic memory and processing.
 
-## Benefits
+## Purpose
 
-- Enhance short-term memory
-- Improve concentration
-- Boost cognitive flexibility
-- Provide fun brain training
+- Establish a scientific baseline of memory performance
+- Provide consistent, repeatable memory assessment
+- Track memory capabilities over time
+- Generate data-driven insights into personal cognitive performance
 
 ## Contributing
 
-We welcome contributions! If you have ideas for new features or improvements, please submit a pull request or open an issue on our GitHub repository.
+We welcome contributions! If you have ideas for improving memory assessment methodologies or game mechanics, please submit a pull request or open an issue on our GitHub repository.
 
-Enjoy the memory challenge and keep your brain sharp!
+Enjoy exploring your cognitive capabilities!
