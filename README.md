@@ -1,51 +1,60 @@
-# Number Memory Game
+# Memory Challenge Games
 
-A challenging game to test your numerical memory!
+A collection of engaging games designed to test and improve your memory skills!
 
-## Objective
+## Games Overview
 
-The objective of this game is to test and improve your ability to remember sequences of numbers. It's designed to challenge your short-term memory and help you enhance your recall skills.
+This project includes three unique memory challenge games:
 
-## How to Play
+### 1. Number Memory Game
 
-1. The game will display a sequence of numbers.
-2. You'll have a few seconds to memorize the sequence.
-3. After the numbers disappear, you'll be prompted to input the sequence you remember.
-4. If you correctly recall the entire sequence, you move on to the next level with a longer sequence.
-5. If you make a mistake, the game ends, and you can start over to try and beat your high score.
+Test your ability to remember and recall numerical sequences.
 
-## Features
+#### Objective
+Memorize increasingly longer sequences of numbers and reproduce them accurately.
 
-- Progressive difficulty: The game starts with shorter sequences and gradually increases in length.
-- Customizable time limit: Adjust how long you have to memorize the numbers.
-- High score tracking: Keep track of your best performances.
-- Various game modes:
-  - Classic: Remember the numbers in the exact order.
-  - Reverse: Recall the numbers in reverse order for an extra challenge.
-  - Sum: Remember the sum of all numbers shown.
+#### How to Play
+1. A sequence of numbers will be displayed.
+2. Memorize the sequence within a limited time.
+3. Input the sequence you remember.
+4. Correctly recall the sequence to advance to the next level.
+5. Each correct round increases the difficulty.
+
+### 2. Box Memorization Game
+
+Challenge your visual memory and spatial recall.
+
+#### Objective
+Memorize the position and pattern of highlighted boxes within a grid.
+
+#### How to Play
+1. A grid of boxes will briefly highlight a specific pattern.
+2. After the pattern disappears, reproduce the exact sequence of highlighted boxes.
+3. Correct recalls increase the grid size and complexity.
+4. Track your progress through increasingly difficult levels.
+
+### 3. Anagrams Game
+
+Test your word skills and mental flexibility.
+
+#### Objective
+Rearrange jumbled letters to form valid words.
+
+#### How to Play
+1. Receive a scrambled set of letters.
+2. Rearrange the letters to create meaningful words.
+3. Race against the clock to find as many words as possible.
+4. Earn points for each correct word discovered.
 
 ## Benefits
 
-- Improves short-term memory
-- Enhances concentration and focus
-- Boosts numerical recall abilities
-- Provides a fun way to exercise your brain
-
-## Getting Started
-
-To start playing, simply launch the game and select your preferred game mode. The game will guide you through the process, starting with a brief tutorial if it's your first time playing.
-
-## Technical Requirements
-
-- Any modern web browser
-- JavaScript enabled
+- Enhance short-term memory
+- Improve concentration
+- Boost cognitive flexibility
+- Provide fun brain training
 
 ## Contributing
 
-We welcome contributions to improve the game! If you have ideas for new features, improvements, or bug fixes, please feel free to submit a pull request or open an issue on our GitHub repository.
+We welcome contributions! If you have ideas for new features or improvements, please submit a pull request or open an issue on our GitHub repository.
 
-## License
-
-This game is open-source and licensed under the MIT License. Feel free to use, modify, and distribute it as you see fit.
-
-Enjoy the game and happy memorizing!
+Enjoy the memory challenge and keep your brain sharp!
