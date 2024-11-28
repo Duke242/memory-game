@@ -8,6 +8,7 @@ import { RiShuffleLine } from "react-icons/ri"
 import toast, { Toaster } from "react-hot-toast"
 import AnimatedScore from "@/components/AnimatedScore"
 import GameOverModal from "@/components/GameOverModal"
+import { Shuffle } from "lucide-react"
 
 interface GameState {
   letters: string
@@ -315,11 +316,11 @@ const Anagrams: React.FC = () => {
             </p>
             <button
               onClick={handleShuffle}
-              className="p-2 text-blue-600 hover:text-blue-800 transition-colors"
+              className="p-1 text-blue-600 hover:text-blue-800 hover:scale-110 transition-colors bg-blue-100 rounded"
               disabled={!gameState.isGameActive}
               title="Shuffle Letters"
             >
-              <RiShuffleLine className="w-6 h-6" />
+              <Shuffle size={32} color="blue" strokeWidth={1.5} />
             </button>
           </div>
           <div className="flex flex-wrap justify-center gap-2 mt-2">
