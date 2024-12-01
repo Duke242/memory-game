@@ -42,7 +42,6 @@ const Anagrams: React.FC = () => {
   useEffect(() => {
     const randomIndex = getRandomIndex()
     const initialLetters = Object.keys(anagrams)[randomIndex]
-    console.log({ initialLetters })
     const initialState: GameState = {
       letters: initialLetters,
       shuffledLetters: shuffleLetters(initialLetters),
@@ -126,12 +125,10 @@ const Anagrams: React.FC = () => {
 
   const checkWord = (word: string): boolean => {
     const lowerCaseWord = word.toLowerCase()
-    console.log({ gameState })
     if (lowerCaseWord.length >= 3 && lowerCaseWord.length <= 6) {
       const currentWordSetKey = Object.keys(anagrams)[gameState.randomIndex]
       const currentWordList =
         anagrams[currentWordSetKey as keyof typeof anagrams]
-      console.log(anagrams[currentWordSetKey as keyof typeof anagrams])
       return currentWordList.includes(lowerCaseWord)
     }
     return false
@@ -381,6 +378,7 @@ const Anagrams: React.FC = () => {
         score={gameState.score}
         wordsFound={gameState.usedWords.size}
         onPlayAgain={startNewGame}
+        possibleWords={Object.values(anagrams)[gameState.randomIndex].length}
       />
     </div>
   )

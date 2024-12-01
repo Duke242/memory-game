@@ -3,11 +3,13 @@ const GameOverModal = ({
   score,
   wordsFound,
   onPlayAgain,
+  possibleWords,
 }: {
   isOpen: boolean
   score: number
   wordsFound: number
   onPlayAgain: () => void
+  possibleWords: number
 }) => {
   if (!isOpen) return null
 
@@ -43,6 +45,9 @@ const GameOverModal = ({
             <p className="text-4xl font-bold text-purple-600">{score}</p>
             <p className="text-sm text-gray-600 mt-2">
               Words Found: {wordsFound}
+            </p>
+            <p className="text-sm text-gray-400 mt-2">
+              Total words: {possibleWords}
             </p>
           </div>
 
