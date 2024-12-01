@@ -312,7 +312,7 @@ const Anagrams: React.FC = () => {
             </p>
             <button
               onClick={handleShuffle}
-              className="p-1 text-blue-600 hover:text-blue-800 hover:scale-110 transition-colors bg-blue-100 rounded"
+              className="p-1 text-blue-600 hover:text-blue-800 hover:scale-110 transition-all duration-300 bg-blue-100 rounded"
               disabled={!gameState.isGameActive}
               title="Shuffle Letters"
             >
