@@ -992,7 +992,6 @@ export const anagrams = {
     "safer",
     "serai",
     "serif",
-
     "airs",
     "ares",
     "arfs",
@@ -1023,7 +1022,6 @@ export const anagrams = {
     "sera",
     "serf",
     "sire",
-
     "air",
     "ais",
     "are",
