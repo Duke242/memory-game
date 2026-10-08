@@ -36,8 +36,6 @@ const NumberGamePage = () => {
 
   useEffect(() => {
     if (phase !== "memorize") return
-    setCurrentNumber(randomDigits(digits))
-    setRemaining(100)
     const startedAt = Date.now()
     const id = window.setInterval(() => {
       const left = 100 - ((Date.now() - startedAt) / (memorizeSeconds * 1000)) * 100
@@ -48,20 +46,28 @@ const NumberGamePage = () => {
       setRemaining(Math.max(0, left))
     }, 50)
     return () => window.clearInterval(id)
-  }, [phase, digits, memorizeSeconds])
+  }, [phase, memorizeSeconds])
 
   useEffect(() => {
     if (phase !== "correct") return
-    const id = window.setTimeout(() => setPhase("memorize"), 900)
+    const id = window.setTimeout(() => beginRound(digits), 900)
     return () => window.clearTimeout(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
+
+  // Set the number before entering the phase so no stale frame is shown.
+  const beginRound = (length: number) => {
+    setCurrentNumber(randomDigits(length))
+    setRemaining(100)
+    setPhase("memorize")
+  }
 
   const start = () => {
     setDigits(startingDigits)
     setRoundsWon(0)
     setAnswer("")
     setIsNewBest(false)
-    setPhase("memorize")
+    beginRound(startingDigits)
   }
 
   const handleSubmit = (e: React.FormEvent) => {

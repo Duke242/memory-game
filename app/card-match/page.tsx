@@ -45,6 +45,7 @@ import {
   Stat,
   cx,
 } from "@/components/game/ui"
+import { shuffle } from "@/libs/shuffle"
 import { useBestScore } from "@/libs/useBestScore"
 
 const SYMBOLS: { name: string; icon: LucideIcon }[] = [
@@ -98,15 +99,6 @@ interface Card {
 }
 
 type Phase = "setup" | "playing" | "done"
-
-const shuffle = <T,>(items: T[]): T[] => {
-  const a = [...items]
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a
-}
 
 const dealCards = (pairs: number): Card[] => {
   const symbols = shuffle(SYMBOLS.map((_, i) => i)).slice(0, pairs)

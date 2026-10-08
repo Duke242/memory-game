@@ -13,6 +13,7 @@ import {
   Stat,
   cx,
 } from "@/components/game/ui"
+import { shuffle } from "@/libs/shuffle"
 import { useBestScore } from "@/libs/useBestScore"
 import { WORDS } from "./words"
 
@@ -21,14 +22,7 @@ type Phase = "setup" | "study" | "recall" | "result"
 const LIST_SIZES = [10, 15, 20]
 const STUDY_TIMES = [30, 45, 60]
 
-const pickWords = (count: number) => {
-  const pool = [...WORDS]
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[pool[i], pool[j]] = [pool[j], pool[i]]
-  }
-  return pool.slice(0, count)
-}
+const pickWords = (count: number) => shuffle(WORDS).slice(0, count)
 
 const normalize = (input: string) => input.toLowerCase().replace(/[^a-z]/g, "")
 
@@ -36,8 +30,7 @@ const normalize = (input: string) => input.toLowerCase().replace(/[^a-z]/g, "")
 const findWord = (input: string, words: string[]) => {
   const guess = normalize(input)
   if (!guess) return null
-  const candidates = [guess, guess.replace(/es$/, ""), guess.replace(/s$/, "")]
-  return words.find((w) => candidates.includes(w)) ?? null
+  return words.find((w) => [w, `${w}s`, `${w}es`].includes(guess)) ?? null
 }
 
 type Feedback = { kind: "found" | "repeat" | "miss"; text: string } | null

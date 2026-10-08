@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { Shuffle } from "lucide-react"
 import GameShell from "@/components/game/GameShell"
 import { Button, Panel, ProgressBar, ResultHeader, Stat, cx } from "@/components/game/ui"
+import { shuffle } from "@/libs/shuffle"
 import { useBestScore } from "@/libs/useBestScore"
 import { anagrams } from "./lettersAndWords"
 
@@ -24,14 +25,8 @@ interface GameState {
 
 type Feedback = { ok: boolean; text: string } | null
 
-const shuffleLetters = (letters: string): string => {
-  const array = letters.split("")
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[array[i], array[j]] = [array[j], array[i]]
-  }
-  return array.join("")
-}
+const shuffleLetters = (letters: string): string =>
+  shuffle(letters.split("")).join("")
 
 const newGame = (): GameState => {
   const randomIndex = Math.floor(Math.random() * letterSets.length)

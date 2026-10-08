@@ -117,7 +117,7 @@ const SequencePage = () => {
         <div className="mb-5 flex items-center justify-between">
           <span className="text-sm font-medium text-muted">Level</span>
           <span className="text-2xl font-semibold tabular-nums">
-            {phase === "idle" ? "—" : level}
+            {phase === "idle" ? "—" : phase === "over" ? completed : level}
           </span>
         </div>
 

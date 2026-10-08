@@ -37,20 +37,6 @@ const BoxGamePage: React.FC = () => {
 
   useEffect(() => {
     if (gameState !== "display") return
-    const total = difficulty * difficulty
-    const newColoredBoxes = Array(total).fill(false)
-    let remainingBoxes = numColoredBoxes
-    while (remainingBoxes > 0) {
-      const randomIndex = Math.floor(Math.random() * total)
-      if (!newColoredBoxes[randomIndex]) {
-        newColoredBoxes[randomIndex] = true
-        remainingBoxes--
-      }
-    }
-    setColoredBoxes(newColoredBoxes)
-    setUserSelection(Array(total).fill(false))
-    setTimeRemaining(100)
-
     const startedAt = Date.now()
     const timer = window.setInterval(() => {
       const left = 100 - ((Date.now() - startedAt) / (displayTime * 1000)) * 100
@@ -61,12 +47,28 @@ const BoxGamePage: React.FC = () => {
       setTimeRemaining(Math.max(0, left))
     }, 50)
     return () => window.clearInterval(timer)
-  }, [gameState, difficulty, displayTime, numColoredBoxes])
+  }, [gameState, displayTime])
 
-  const handleStartGame = () => {
+  // Deal the board before entering the display phase so no stale frame is shown.
+  const beginRound = (gridSize: number, boxes: number) => {
+    const total = gridSize * gridSize
+    const newColoredBoxes = Array(total).fill(false)
+    let remainingBoxes = boxes
+    while (remainingBoxes > 0) {
+      const randomIndex = Math.floor(Math.random() * total)
+      if (!newColoredBoxes[randomIndex]) {
+        newColoredBoxes[randomIndex] = true
+        remainingBoxes--
+      }
+    }
+    setColoredBoxes(newColoredBoxes)
+    setUserSelection(Array(total).fill(false))
+    setTimeRemaining(100)
     setIsNewBest(false)
     setGameState("display")
   }
+
+  const handleStartGame = () => beginRound(difficulty, numColoredBoxes)
 
   const handleBoxClick = (index: number) => {
     if (gameState !== "recall") return
@@ -119,8 +121,7 @@ const BoxGamePage: React.FC = () => {
 
     setDifficulty(newDifficulty)
     setNumColoredBoxes(newNumColoredBoxes)
-    setIsNewBest(false)
-    setGameState("display")
+    beginRound(newDifficulty, newNumColoredBoxes)
   }
 
   const selectedCount = userSelection.filter(Boolean).length

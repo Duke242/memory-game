@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 // Personal bests live in this browser only (localStorage). Every access is
 // guarded because storage can be unavailable (private mode, blocked cookies).
@@ -36,10 +36,20 @@ export const useBestScore = (
   { lowerIsBetter = false }: { lowerIsBetter?: boolean } = {}
 ) => {
   const [best, setBest] = useState<number | null>(null)
+  // Mirrors `best` so comparisons still work when storage is unavailable.
+  const bestRef = useRef<number | null>(null)
 
   useEffect(() => {
-    setBest(readBestScore(key))
-    const sync = () => setBest(readBestScore(key))
+    bestRef.current = readBestScore(key)
+    setBest(bestRef.current)
+    // Pick up writes from other tabs or components. A failed read (null)
+    // never wipes a best we already know about.
+    const sync = () => {
+      const stored = readBestScore(key)
+      if (stored === null) return
+      bestRef.current = stored
+      setBest(stored)
+    }
     window.addEventListener(EVENT, sync)
     window.addEventListener("storage", sync)
     return () => {
@@ -50,13 +60,14 @@ export const useBestScore = (
 
   const submit = useCallback(
     (score: number): boolean => {
-      const previous = readBestScore(key)
+      const previous = readBestScore(key) ?? bestRef.current
       const isBetter =
         previous === null ||
         (lowerIsBetter ? score < previous : score > previous)
       if (isBetter) {
-        writeBestScore(key, score)
+        bestRef.current = score
         setBest(score)
+        writeBestScore(key, score)
       }
       return isBetter
     },
