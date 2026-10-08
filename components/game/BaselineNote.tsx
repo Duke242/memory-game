@@ -19,7 +19,9 @@ const BaselineNote = ({
   if (!comparison) return null
 
   if (comparison.status === "warming-up") {
-    const done = TOTAL - comparison.needed
+    // `needed` counts from before this round; this round has now been saved too.
+    const remaining = Math.max(0, comparison.needed - 1)
+    const done = TOTAL - remaining
     return (
       <div className="rounded-xl bg-surface-2 p-4 text-sm">
         <div className="flex items-center justify-between gap-3">
@@ -37,8 +39,9 @@ const BaselineNote = ({
           ))}
         </div>
         <p className="mt-3 text-muted">
-          After {comparison.needed} more round{comparison.needed === 1 ? "" : "s"} on this
-          device we&apos;ll tell you whether a result is above, within or below your usual.
+          {remaining === 0
+            ? "From your next round on this device, we'll tell you whether a result is better than, within or weaker than your usual."
+            : `After ${remaining} more round${remaining === 1 ? "" : "s"} on this device, we'll tell you whether a result is better than, within or weaker than your usual.`}
         </p>
       </div>
     )
