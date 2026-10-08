@@ -1,67 +1,131 @@
-import Link from "next/link"
 import { getSEOTags } from "@/libs/seo"
 import config from "@/config"
-
-// CHATGPT PROMPT TO GENERATE YOUR PRIVACY POLICY — replace with your own data 👇
-
-// 1. Go to https://chat.openai.com/
-// 2. Copy paste bellow
-// 3. Replace the data with your own (if needed)
-// 4. Paste the answer from ChatGPT directly in the <pre> tag below
-
-// You are an excellent lawyer.
-
-// I need your help to write a simple privacy policy for my website. Here is some context:
-// - Website: https://shipfa.st
-// - Name: ShipFast
-// - Description: A JavaScript code boilerplate to help entrepreneurs launch their startups faster
-// - User data collected: name, email and payment information
-// - Non-personal data collection: web cookies
-// - Purpose of Data Collection: Order processing
-// - Data sharing: we do not share the data with any other parties
-// - Children's Privacy: we do not collect any data from children
-// - Updates to the Privacy Policy: users will be updated by email
-// - Contact information: marc@shipfa.st
-
-// Please write a simple privacy policy for my site. Add the current date.  Do not add or explain your reasoning. Answer:
+import LegalPage, { LegalSection } from "@/components/LegalPage"
 
 export const metadata = getSEOTags({
   title: `Privacy Policy | ${config.appName}`,
   canonicalUrlRelative: "/privacy-policy",
 })
 
-const PrivacyPolicy = () => {
-  return (
-    <main className="max-w-xl mx-auto">
-      <div className="p-5">
-        <Link href="/" className="btn btn-ghost">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="w-5 h-5"
-          >
-            <path
-              fillRule="evenodd"
-              d="M15 10a.75.75 0 01-.75.75H7.612l2.158 1.96a.75.75 0 11-1.04 1.08l-3.5-3.25a.75.75 0 010-1.08l3.5-3.25a.75.75 0 111.04 1.08L7.612 9.25h6.638A.75.75 0 0115 10z"
-              clipRule="evenodd"
-            />
-          </svg>{" "}
-          Back
-        </Link>
-        <h1 className="text-3xl font-extrabold pb-6">
-          Privacy Policy for {config.appName}
-        </h1>
+const PrivacyPolicy = () => (
+  <LegalPage
+    title="Privacy Policy"
+    updated="October 8, 2026"
+    intro={
+      <p>
+        <strong>The short version:</strong> you don&apos;t need an account to
+        play, we never ask for your name or email, and your best scores stay in
+        your own browser. We use privacy-friendly, cookie-free analytics to see
+        which pages are visited, and that&apos;s it.
+      </p>
+    }
+  >
+    <LegalSection title="Who we are">
+      <p>
+        {config.appName} ({config.domainName}) is a free website with memory
+        games. In this policy, &ldquo;we&rdquo; and &ldquo;us&rdquo; mean the
+        person who runs {config.appName}.
+      </p>
+    </LegalSection>
 
-        <pre
-          className="leading-relaxed whitespace-pre-wrap"
-          style={{ fontFamily: "sans-serif" }}
-        >
-          {}
-        </pre>
-      </div>
-    </main>
-  )
-}
+    <LegalSection title="What we don't collect">
+      <p>
+        You can play every game without signing up. We don&apos;t ask for your
+        name, email address, payment details or any other personal
+        information. We don&apos;t show ads and we don&apos;t sell or rent data
+        to anyone.
+      </p>
+    </LegalSection>
+
+    <LegalSection title="Scores saved on your device">
+      <p>
+        Your personal best for each game is saved in your browser&apos;s local
+        storage so it&apos;s still there next time you visit. It stays on your
+        device and is never sent to us. You can delete it at any time by
+        clearing this site&apos;s data in your browser settings. If you use a
+        different browser or device, your scores won&apos;t follow you.
+      </p>
+    </LegalSection>
+
+    <LegalSection title="Analytics">
+      <p>
+        To understand how the site is used, we use two analytics tools that
+        don&apos;t use cookies and don&apos;t track you across other websites:
+      </p>
+      <ul>
+        <li>
+          <a href="https://plausible.io/data-policy" target="_blank" rel="noreferrer">
+            Plausible Analytics
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://vercel.com/docs/analytics/privacy-policy"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Vercel Web Analytics
+          </a>
+        </li>
+      </ul>
+      <p>
+        They report aggregate information such as which pages were viewed, the
+        referring website, and general browser, device and country details. We
+        can&apos;t use this to identify you. If you&apos;d rather not be
+        counted, a content blocker will stop these scripts and the games will
+        still work.
+      </p>
+    </LegalSection>
+
+    <LegalSection title="Hosting">
+      <p>
+        The site is hosted by{" "}
+        <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noreferrer">
+          Vercel
+        </a>
+        . Like any web host, Vercel processes basic technical information
+        your browser sends with each request, such as your IP address and
+        browser type, to deliver the site and protect it from abuse. Fonts are
+        served from our own domain, not from a third party.
+      </p>
+    </LegalSection>
+
+    <LegalSection title="Accounts">
+      <p>
+        The site&apos;s code includes a sign-in feature that isn&apos;t offered
+        to visitors today. Because that code loads on every page, your browser
+        may check for a sign-in session and store a small technical entry in
+        local storage; no account or personal information is created. If we
+        ever offer accounts, we&apos;ll update this policy before collecting
+        anything, and explain what we store and why.
+      </p>
+    </LegalSection>
+
+    <LegalSection title="Children">
+      <p>
+        {config.appName} is suitable for all ages. Because we don&apos;t collect
+        personal information from anyone, we don&apos;t knowingly collect it
+        from children under 13 either.
+      </p>
+    </LegalSection>
+
+    <LegalSection title="Changes to this policy">
+      <p>
+        If anything here changes, we&apos;ll update this page and the date at
+        the top.
+      </p>
+    </LegalSection>
+
+    <LegalSection title="Contact">
+      <p>
+        Questions about privacy? Open an issue on{" "}
+        <a href={config.contactUrl} target="_blank" rel="noreferrer">
+          our GitHub page
+        </a>
+        .
+      </p>
+    </LegalSection>
+  </LegalPage>
+)
 
 export default PrivacyPolicy
