@@ -22,6 +22,11 @@ const Grid = ({ size, lit }: { size: number; lit: number[] }) => (
 )
 
 const previews: Record<string, () => React.ReactElement> = {
+  alertness: () => (
+    <span className="flex h-16 w-28 items-center justify-center rounded-xl bg-brand font-mono text-2xl font-semibold text-white">
+      284<span className="ml-1 text-sm font-medium text-white/70">ms</span>
+    </span>
+  ),
   sequence: () => (
     <div className="relative">
       <Grid size={3} lit={[4]} />

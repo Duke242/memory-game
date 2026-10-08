@@ -3,6 +3,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import GameShell from "@/components/game/GameShell"
 import { Button, Panel, ResultHeader, cx } from "@/components/game/ui"
+import BaselineNote from "@/components/game/BaselineNote"
+import { recordResult, type Comparison } from "@/libs/history"
 import { useBestScore } from "@/libs/useBestScore"
 
 type Phase = "idle" | "showing" | "input" | "success" | "over"
@@ -24,6 +26,7 @@ const SequencePage = () => {
   const [pressed, setPressed] = useState<number | null>(null)
   const [mistake, setMistake] = useState<{ picked: number; expected: number } | null>(null)
   const [isNewBest, setIsNewBest] = useState(false)
+  const [comparison, setComparison] = useState<Comparison | null>(null)
   const timeouts = useRef<number[]>([])
   const { best, submit } = useBestScore("sequence")
 
@@ -58,6 +61,7 @@ const SequencePage = () => {
     clearTimers()
     setMistake(null)
     setIsNewBest(false)
+    setComparison(null)
     setLit(null)
     setSequence([randomTile()])
     setPhase("showing")
@@ -75,6 +79,7 @@ const SequencePage = () => {
         setPressed(null)
         setMistake({ picked: tile, expected: sequence[inputIndex] })
         const completed = sequence.length - 1
+        setComparison(recordResult("sequence", completed))
         setIsNewBest(completed > 0 && submit(completed))
         setPhase("over")
         return
@@ -185,6 +190,7 @@ const SequencePage = () => {
               }
               newBest={isNewBest}
             />
+            <BaselineNote comparison={comparison} unit="tiles" />
             <Button fullWidth onClick={start}>
               Play again
             </Button>

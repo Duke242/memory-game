@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from "react"
 import { Shuffle } from "lucide-react"
 import GameShell from "@/components/game/GameShell"
 import { Button, Panel, ProgressBar, ResultHeader, Stat, cx } from "@/components/game/ui"
+import BaselineNote from "@/components/game/BaselineNote"
+import { recordResult, type Comparison } from "@/libs/history"
 import { shuffle } from "@/libs/shuffle"
 import { useBestScore } from "@/libs/useBestScore"
 import { anagrams } from "./lettersAndWords"
@@ -63,6 +65,7 @@ const Anagrams: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null)
   const [feedback, setFeedback] = useState<Feedback>(null)
   const [isNewBest, setIsNewBest] = useState(false)
+  const [comparison, setComparison] = useState<Comparison | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const { best, submit } = useBestScore("anagrams")
 
@@ -88,7 +91,9 @@ const Anagrams: React.FC = () => {
   // Record the score once when the clock runs out.
   const isOver = gameState !== null && !gameState.isGameActive
   useEffect(() => {
-    if (isOver && gameState) setIsNewBest(gameState.score > 0 && submit(gameState.score))
+    if (!isOver || !gameState) return
+    setComparison(recordResult("anagrams", gameState.score))
+    setIsNewBest(gameState.score > 0 && submit(gameState.score))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOver])
 
@@ -106,6 +111,7 @@ const Anagrams: React.FC = () => {
     setGameState(newGame())
     setFeedback(null)
     setIsNewBest(false)
+    setComparison(null)
     window.setTimeout(() => inputRef.current?.focus(), 0)
   }
 
@@ -164,6 +170,7 @@ const Anagrams: React.FC = () => {
             description={`You found ${gameState.usedWords.length} of ${possibleWords.length} possible words from ${gameState.letters.toUpperCase()}.`}
             newBest={isNewBest}
           />
+          <BaselineNote comparison={comparison} unit="pts" />
           {gameState.usedWords.length > 0 && (
             <ul className="flex flex-wrap justify-center gap-2">
               {gameState.usedWords.map((word) => (

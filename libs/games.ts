@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react"
-import { Binary, Grid3x3, Shuffle, Workflow, Layers, ListChecks } from "lucide-react"
+import { Binary, Grid3x3, Shuffle, Workflow, Layers, ListChecks, Zap } from "lucide-react"
 
-export type ScoreFormat = "digits" | "boxes" | "points" | "level" | "moves" | "words"
+export type ScoreFormat = "digits" | "boxes" | "points" | "level" | "moves" | "words" | "ms"
 
 export interface GameMeta {
   id: string
@@ -18,11 +18,29 @@ export interface GameMeta {
   /** Total for formats shown as "x of y" (word recall). */
   formatTotal?: number
   isNew?: boolean
+  /** Unit for history ranges and charts. */
+  unit: string
+  lowerIsBetter?: boolean
 }
 
 export const games: GameMeta[] = [
   {
+    id: "alertness",
+    unit: "ms",
+    lowerIsBetter: true,
+    title: "Alertness Check",
+    href: "/alertness",
+    skill: "Reaction & vigilance",
+    description:
+      "A 3-minute reaction test. See whether you're as sharp as usual today.",
+    icon: Zap,
+    bestKey: "alertness",
+    format: "ms",
+    isNew: true,
+  },
+  {
     id: "sequence",
+    unit: "tiles",
     title: "Sequence Memory",
     href: "/sequence",
     skill: "Sequence memory",
@@ -35,6 +53,8 @@ export const games: GameMeta[] = [
   },
   {
     id: "card-match",
+    unit: "moves",
+    lowerIsBetter: true,
     title: "Card Match",
     href: "/card-match",
     skill: "Visual memory",
@@ -48,6 +68,7 @@ export const games: GameMeta[] = [
   },
   {
     id: "word-recall",
+    unit: "words",
     title: "Word Recall",
     href: "/word-recall",
     skill: "Verbal memory",
@@ -62,6 +83,7 @@ export const games: GameMeta[] = [
   },
   {
     id: "number",
+    unit: "digits",
     title: "Number Memory",
     href: "/game",
     skill: "Short-term memory",
@@ -73,6 +95,7 @@ export const games: GameMeta[] = [
   },
   {
     id: "box",
+    unit: "boxes",
     title: "Box Memory",
     href: "/box-game",
     skill: "Spatial memory",
@@ -84,6 +107,7 @@ export const games: GameMeta[] = [
   },
   {
     id: "anagrams",
+    unit: "pts",
     title: "Anagrams",
     href: "/anagrams",
     skill: "Word skills",
@@ -122,5 +146,33 @@ export const formatScore = (
       return plural(value, "move", "moves")
     case "words":
       return total ? `${value} / ${total} words` : plural(value, "word", "words")
+    case "ms":
+      return `${value.toLocaleString()} ms`
+  }
+}
+
+const CARD_BOARDS: Record<string, string> = { easy: "4×3", medium: "4×4", hard: "6×4" }
+
+/**
+ * Describes a history key (see recordResult calls in each game), e.g.
+ * "word-recall:15:45s" -> Word Recall, "15 words · 45s study".
+ */
+export const describeHistoryKey = (
+  key: string
+): { game: GameMeta; mode: string | null } | null => {
+  const [id, a, b] = key.split(":")
+  const game = games.find((g) => g.id === id)
+  if (!game) return null
+  switch (id) {
+    case "number":
+      return { game, mode: a ? `${a} to memorize` : null }
+    case "box":
+      return { game, mode: a ? `${a} display time` : null }
+    case "card-match":
+      return { game, mode: a ? `${CARD_BOARDS[a] ?? a} board` : null }
+    case "word-recall":
+      return { game, mode: a ? `${a} words${b ? ` · ${b} study` : ""}` : null }
+    default:
+      return { game, mode: null }
   }
 }

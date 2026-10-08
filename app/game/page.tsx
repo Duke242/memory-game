@@ -13,6 +13,8 @@ import {
   Slider,
   cx,
 } from "@/components/game/ui"
+import BaselineNote from "@/components/game/BaselineNote"
+import { recordResult, type Comparison } from "@/libs/history"
 import { useBestScore } from "@/libs/useBestScore"
 
 type Phase = "setup" | "memorize" | "input" | "correct" | "result"
@@ -32,6 +34,7 @@ const NumberGamePage = () => {
   const [lastAnswer, setLastAnswer] = useState("")
   const [remaining, setRemaining] = useState(100)
   const [isNewBest, setIsNewBest] = useState(false)
+  const [comparison, setComparison] = useState<Comparison | null>(null)
   const { best, submit } = useBestScore("number")
 
   useEffect(() => {
@@ -67,6 +70,7 @@ const NumberGamePage = () => {
     setRoundsWon(0)
     setAnswer("")
     setIsNewBest(false)
+    setComparison(null)
     beginRound(startingDigits)
   }
 
@@ -80,6 +84,8 @@ const NumberGamePage = () => {
       setPhase("correct")
     } else {
       const recalled = roundsWon > 0 ? digits - 1 : 0
+      // A run that fails its first round says more about the starting length than about memory.
+      setComparison(roundsWon > 0 ? recordResult(`number:${memorizeSeconds}s`, recalled) : null)
       setIsNewBest(recalled > 0 && submit(recalled))
       setPhase("result")
     }
@@ -174,6 +180,7 @@ const NumberGamePage = () => {
             description="Most people can hold about 7 digits in short-term memory."
             newBest={isNewBest}
           />
+          <BaselineNote comparison={comparison} unit="digits" />
           <dl className="space-y-3 rounded-xl bg-surface-2 p-4 text-center">
             <div>
               <dt className="text-xs font-medium uppercase tracking-wide text-muted">

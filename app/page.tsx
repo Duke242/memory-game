@@ -23,6 +23,12 @@ export default function Page() {
               Games
             </Link>
             <Link
+              href="/progress"
+              className="focus-ring hidden rounded-lg px-3 py-2 text-sm font-medium text-muted hover:text-ink sm:block"
+            >
+              Your progress
+            </Link>
+            <Link
               href="#benefits"
               className="focus-ring hidden rounded-lg px-3 py-2 text-sm font-medium text-muted hover:text-ink sm:block"
             >
@@ -83,8 +89,12 @@ export default function Page() {
             <div className="mb-10 max-w-2xl">
               <h2 className="text-3xl font-bold tracking-tight">Pick a game</h2>
               <p className="mt-3 text-muted">
-                Each one trains a different kind of memory. Your best scores are
-                saved on this device.
+                Each one trains a different kind of memory. Your results are
+                saved on this device, so you can{" "}
+                <Link href="/progress" className="font-medium text-brand-ink hover:underline">
+                  track your progress
+                </Link>
+                .
               </p>
             </div>
             <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

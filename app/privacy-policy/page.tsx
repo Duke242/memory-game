@@ -14,8 +14,8 @@ const PrivacyPolicy = () => (
     intro={
       <p>
         <strong>The short version:</strong> you don&apos;t need an account to
-        play, we never ask for your name or email, and your best scores stay in
-        your own browser. We use privacy-friendly, cookie-free analytics to see
+        play, we never ask for your name or email, and your scores and history
+        stay in your own browser. We use privacy-friendly, cookie-free analytics to see
         which pages are visited, and that&apos;s it.
       </p>
     }
@@ -39,11 +39,17 @@ const PrivacyPolicy = () => (
 
     <LegalSection title="Scores saved on your device">
       <p>
-        Your personal best for each game is saved in your browser&apos;s local
-        storage so it&apos;s still there next time you visit. It stays on your
-        device and is never sent to us. You can delete it at any time by
-        clearing this site&apos;s data in your browser settings. If you use a
-        different browser or device, your scores won&apos;t follow you.
+        Your personal best for each game, and a history of your results (the
+        score, when you played, and whether you used a mouse or a touchscreen),
+        are saved in your browser&apos;s local storage. This powers your usual
+        range and the charts on the Progress page. It stays on your device and
+        is never sent to us.
+      </p>
+      <p>
+        You can delete your history with &ldquo;Clear history&rdquo; on the
+        Progress page, or remove everything by clearing this site&apos;s data in
+        your browser settings. If you use a different browser or device, your
+        results won&apos;t follow you.
       </p>
     </LegalSection>
 
