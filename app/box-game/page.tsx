@@ -15,6 +15,8 @@ import {
   Stat,
   cx,
 } from "@/components/game/ui"
+import BaselineNote from "@/components/game/BaselineNote"
+import { recordResult, type Comparison } from "@/libs/history"
 import { useBestScore } from "@/libs/useBestScore"
 
 type GameState = "setup" | "display" | "recall" | "result"
@@ -33,6 +35,9 @@ const BoxGamePage: React.FC = () => {
   const [score, setScore] = useState<number>(0)
   const [stats, setStats] = useState({ correct: 0, incorrect: 0, missed: 0 })
   const [isNewBest, setIsNewBest] = useState(false)
+  const [comparison, setComparison] = useState<Comparison | null>(null)
+  // Perfect rounds since the last miss; a run ends on the first imperfect round.
+  const [runWins, setRunWins] = useState(0)
   const { best, submit } = useBestScore("box")
 
   useEffect(() => {
@@ -99,6 +104,15 @@ const BoxGamePage: React.FC = () => {
     setScore(percentage)
     setStats({ correct, incorrect, missed })
     setIsNewBest(percentage === 100 && submit(numColoredBoxes))
+    if (percentage === 100) {
+      setRunWins((w) => w + 1)
+      setComparison(null)
+    } else {
+      setComparison(
+        runWins > 0 ? recordResult(`box:${displayTime}s`, numColoredBoxes - 1) : null
+      )
+      setRunWins(0)
+    }
     setGameState("result")
   }
 
@@ -111,6 +125,8 @@ const BoxGamePage: React.FC = () => {
     } else if (difficulty === 4 && numColoredBoxes >= 12) {
       newDifficulty = 5
     } else if (difficulty === 5 && numColoredBoxes >= 20) {
+      recordResult(`box:${displayTime}s`, numColoredBoxes)
+      setRunWins(0)
       toast.success("Congratulations! You've beaten the highest level!", {
         duration: 3000,
         position: "top-center",
@@ -249,6 +265,9 @@ const BoxGamePage: React.FC = () => {
             newBest={isNewBest}
           />
           {renderGrid()}
+          {comparison && (
+            <BaselineNote comparison={comparison} unit="boxes" />
+          )}
           <div className="grid grid-cols-3 gap-2 sm:gap-3">
             <Stat label="Correct" value={stats.correct} tone="good" />
             <Stat label="Wrong" value={stats.incorrect} tone={stats.incorrect ? "bad" : "neutral"} />

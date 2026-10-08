@@ -46,6 +46,8 @@ import {
   cx,
 } from "@/components/game/ui"
 import { shuffle } from "@/libs/shuffle"
+import BaselineNote from "@/components/game/BaselineNote"
+import { recordResult, type Comparison } from "@/libs/history"
 import { useBestScore } from "@/libs/useBestScore"
 
 const SYMBOLS: { name: string; icon: LucideIcon }[] = [
@@ -123,6 +125,7 @@ const CardMatchPage = () => {
   const [startedAt, setStartedAt] = useState<number | null>(null)
   const [elapsed, setElapsed] = useState(0)
   const [isNewBest, setIsNewBest] = useState(false)
+  const [comparison, setComparison] = useState<Comparison | null>(null)
   const timeout = useRef<number | null>(null)
   const { best, submit } = useBestScore(`card-match:${difficulty}`, {
     lowerIsBetter: true,
@@ -155,6 +158,7 @@ const CardMatchPage = () => {
     setStartedAt(null)
     setElapsed(0)
     setIsNewBest(false)
+    setComparison(null)
     setPhase("playing")
   }
 
@@ -180,6 +184,9 @@ const CardMatchPage = () => {
       setFlipped([])
       if (updated.every((c) => c.matched)) {
         setElapsed(Math.floor((Date.now() - (startedAt ?? Date.now())) / 1000))
+        setComparison(
+          recordResult(`card-match:${difficulty}`, totalMoves, { lowerIsBetter: true })
+        )
         setIsNewBest(submit(totalMoves))
         setPhase("done")
       }
@@ -287,6 +294,7 @@ const CardMatchPage = () => {
               description={`${formatTime(elapsed)} on ${config.label}. A perfect game is ${config.pairs} moves.`}
               newBest={isNewBest}
             />
+            <BaselineNote comparison={comparison} unit="moves" />
             <div className="grid gap-3 sm:grid-cols-2">
               <Button fullWidth onClick={start}>
                 Play again

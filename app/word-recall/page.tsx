@@ -13,6 +13,8 @@ import {
   Stat,
   cx,
 } from "@/components/game/ui"
+import BaselineNote from "@/components/game/BaselineNote"
+import { recordResult, type Comparison } from "@/libs/history"
 import { shuffle } from "@/libs/shuffle"
 import { useBestScore } from "@/libs/useBestScore"
 import { WORDS } from "./words"
@@ -46,6 +48,7 @@ const WordRecallPage = () => {
   const [feedback, setFeedback] = useState<Feedback>(null)
   const [remaining, setRemaining] = useState(100)
   const [isNewBest, setIsNewBest] = useState(false)
+  const [comparison, setComparison] = useState<Comparison | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const { best, submit } = useBestScore(`word-recall:${listSize}`)
 
@@ -75,10 +78,12 @@ const WordRecallPage = () => {
     setFeedback(null)
     setRemaining(100)
     setIsNewBest(false)
+    setComparison(null)
     setPhase("study")
   }
 
   const finish = (finalFound: string[]) => {
+    setComparison(recordResult(`word-recall:${listSize}:${studyTime}s`, finalFound.length))
     setIsNewBest(finalFound.length > 0 && submit(finalFound.length))
     setPhase("result")
   }
@@ -240,6 +245,7 @@ const WordRecallPage = () => {
             }
             newBest={isNewBest}
           />
+          <BaselineNote comparison={comparison} unit="words" />
           <div>
             <h3 className="mb-3 text-sm font-medium text-muted">The full list</h3>
             <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">

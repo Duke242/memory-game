@@ -26,13 +26,21 @@ const GameShell = ({
       <header className="border-b border-line bg-surface/80 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
           <Logo />
-          <Link
-            href="/#games"
-            className="focus-ring inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm font-medium text-muted hover:text-ink"
-          >
-            <ArrowLeft size={16} aria-hidden />
-            All games
-          </Link>
+          <nav className="flex items-center gap-1">
+            <Link
+              href="/progress"
+              className="focus-ring rounded-lg px-2 py-1 text-sm font-medium text-muted hover:text-ink"
+            >
+              Progress
+            </Link>
+            <Link
+              href="/#games"
+              className="focus-ring inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm font-medium text-muted hover:text-ink"
+            >
+              <ArrowLeft size={16} aria-hidden />
+              All games
+            </Link>
+          </nav>
         </div>
       </header>
 
