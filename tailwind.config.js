@@ -7,6 +7,23 @@ module.exports = {
   ],
   theme: {
     extend: {
+      // Design tokens, defined as RGB channels in app/globals.css so they
+      // switch automatically between light and dark mode.
+      colors: {
+        canvas: "rgb(var(--mm-canvas) / <alpha-value>)",
+        surface: "rgb(var(--mm-surface) / <alpha-value>)",
+        "surface-2": "rgb(var(--mm-surface-2) / <alpha-value>)",
+        line: "rgb(var(--mm-line) / <alpha-value>)",
+        ink: "rgb(var(--mm-ink) / <alpha-value>)",
+        muted: "rgb(var(--mm-muted) / <alpha-value>)",
+        brand: "rgb(var(--mm-brand) / <alpha-value>)",
+        "brand-ink": "rgb(var(--mm-brand-ink) / <alpha-value>)",
+        "brand-soft": "rgb(var(--mm-brand-soft) / <alpha-value>)",
+        good: "rgb(var(--mm-good) / <alpha-value>)",
+        "good-soft": "rgb(var(--mm-good-soft) / <alpha-value>)",
+        bad: "rgb(var(--mm-bad) / <alpha-value>)",
+        "bad-soft": "rgb(var(--mm-bad-soft) / <alpha-value>)",
+      },
       backgroundImage: {
         gradient:
           "linear-gradient(60deg, #f79533, #f37055, #ef4e7b, #a166ab, #5073b8, #1098ad, #07b39b, #6fba82)",
@@ -17,8 +34,25 @@ module.exports = {
         wiggle: "wiggle 1.5s ease-in-out infinite",
         popup: "popup 0.25s ease-in-out",
         shimmer: "shimmer 3s ease-out infinite alternate",
+        "fade-up": "fadeUp 0.35s ease-out both",
+        pop: "pop 0.25s ease-out",
+        shake: "shake 0.4s ease-in-out",
       },
       keyframes: {
+        fadeUp: {
+          "0%": { opacity: 0, transform: "translateY(8px)" },
+          "100%": { opacity: 1, transform: "translateY(0)" },
+        },
+        pop: {
+          "0%": { transform: "scale(0.92)" },
+          "60%": { transform: "scale(1.04)" },
+          "100%": { transform: "scale(1)" },
+        },
+        shake: {
+          "0%, 100%": { transform: "translateX(0)" },
+          "20%, 60%": { transform: "translateX(-6px)" },
+          "40%, 80%": { transform: "translateX(6px)" },
+        },
         opacity: {
           "0%": { opacity: 0 },
           "100%": { opacity: 1 },
