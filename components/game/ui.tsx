@@ -101,6 +101,7 @@ export function SegmentedControl<T extends string | number>({
   label: string
   options: { value: T; label: React.ReactNode }[]
   value: T
+  // eslint-disable-next-line no-unused-vars
   onChange: (value: T) => void
   columns?: number
 }) {
@@ -150,6 +151,7 @@ export const Slider = ({
   min: number
   max: number
   step?: number
+  // eslint-disable-next-line no-unused-vars
   onChange: (value: number) => void
 }) => (
   <input
@@ -160,7 +162,7 @@ export const Slider = ({
     step={step}
     value={value}
     onChange={(e) => onChange(Number(e.target.value))}
-    className="focus-ring h-2 w-full cursor-pointer appearance-none rounded-full bg-surface-2 accent-[rgb(var(--mm-brand))]"
+    className="focus-ring w-full cursor-pointer rounded-full accent-[rgb(var(--mm-brand))]"
   />
 )
 

@@ -4,7 +4,7 @@ A scientific approach to memory assessment and tracking.
 
 ## Games Overview
 
-MemoryMaster provides three precision memory challenge games designed to establish and track your memory baseline:
+MemoryMaster provides six memory challenge games designed to establish and track your memory baseline:
 
 ### 1. Number Memory Game
 
@@ -45,6 +45,22 @@ Assess your ability to manipulate and recall linguistic information.
 2. Rearrange the letters to create meaningful words.
 3. Track your performance in word generation and recall.
 4. Generate metrics for linguistic memory and processing.
+
+### 4. Sequence Memory
+
+Tiles on a 3×3 grid light up one after another. Repeat the sequence in order; it grows by one tile every round. Your score is the longest sequence you repeated.
+
+### 5. Card Match
+
+The classic concentration game. Flip two cards at a time to find every pair on a 4×3, 4×4 or 6×4 board. Your score is the number of moves (fewer is better).
+
+### 6. Word Recall
+
+Study a list of 10, 15 or 20 words, then type back as many as you can remember in any order. Your score is how many you recalled.
+
+## Personal bests
+
+Each game saves your best score in the browser (localStorage), so no account is needed. Bests are shown on the home page and on each game screen.
 
 ## Purpose
 

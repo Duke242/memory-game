@@ -11,8 +11,11 @@ import "./globals.css"
 const font = Inter({ subsets: ["latin"] })
 
 export const viewport: Viewport = {
-  // Will use the primary color of your theme to show a nice theme color in the URL bar of supported browsers
-  themeColor: config.colors.main,
+  // Matches the page background (see --mm-canvas in globals.css)
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f7f7fb" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0b13" },
+  ],
   width: "device-width",
   initialScale: 1,
 }

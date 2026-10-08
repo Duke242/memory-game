@@ -44,6 +44,8 @@ body {
   scroll-behavior: smooth !important;
 }
 
+/* html[data-theme] outranks daisyUI's [data-theme] background. */
+html[data-theme],
 body {
   @apply bg-canvas text-ink antialiased;
 }

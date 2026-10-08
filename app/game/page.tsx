@@ -1,229 +1,207 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { CheckCircle, XCircle } from "lucide-react"
-import { GiBrain } from "react-icons/gi"
-import Link from "next/link"
+import React, { useEffect, useState } from "react"
+import { Check } from "lucide-react"
+import GameShell from "@/components/game/GameShell"
+import {
+  Button,
+  Field,
+  Panel,
+  ProgressBar,
+  ResultHeader,
+  SegmentedControl,
+  Slider,
+  cx,
+} from "@/components/game/ui"
+import { useBestScore } from "@/libs/useBestScore"
 
-const GamePage = () => {
+type Phase = "setup" | "memorize" | "input" | "correct" | "result"
+
+// Built digit by digit so long numbers keep full precision.
+const randomDigits = (length: number) =>
+  Array.from({ length }, () => Math.floor(Math.random() * 10)).join("")
+
+const NumberGamePage = () => {
+  const [phase, setPhase] = useState<Phase>("setup")
   const [startingDigits, setStartingDigits] = useState(1)
+  const [memorizeSeconds, setMemorizeSeconds] = useState(7)
+  const [digits, setDigits] = useState(0)
+  const [roundsWon, setRoundsWon] = useState(0)
   const [currentNumber, setCurrentNumber] = useState("")
-  const [userInput, setUserInput] = useState("")
-  const [lastInput, setLastInput] = useState("")
-  const [score, setScore] = useState(0)
-  const [gameState, setGameState] = useState("setup") // 'setup', 'memorize', 'input', 'result', 'correct'
-  const [timeRemaining, setTimeRemaining] = useState(100) // Percentage of time remaining
-  const [selectedTime, setSelectedTime] = useState(70)
+  const [answer, setAnswer] = useState("")
+  const [lastAnswer, setLastAnswer] = useState("")
+  const [remaining, setRemaining] = useState(100)
+  const [isNewBest, setIsNewBest] = useState(false)
+  const { best, submit } = useBestScore("number")
 
   useEffect(() => {
-    if (gameState === "memorize") {
-      const newNumber = generateRandomNumber(score)
-      setCurrentNumber(newNumber)
-      setTimeRemaining(100)
-
-      const timer = setInterval(() => {
-        setTimeRemaining((prevTime) => {
-          if (prevTime <= 0) {
-            clearInterval(timer)
-            setGameState("input")
-            return 0
-          }
-          return prevTime - 100 / selectedTime
-        })
-      }, 100)
-
-      return () => clearInterval(timer)
-    }
-  }, [gameState, score, selectedTime])
+    if (phase !== "memorize") return
+    setCurrentNumber(randomDigits(digits))
+    setRemaining(100)
+    const startedAt = Date.now()
+    const id = window.setInterval(() => {
+      const left = 100 - ((Date.now() - startedAt) / (memorizeSeconds * 1000)) * 100
+      if (left <= 0) {
+        window.clearInterval(id)
+        setPhase("input")
+      }
+      setRemaining(Math.max(0, left))
+    }, 50)
+    return () => window.clearInterval(id)
+  }, [phase, digits, memorizeSeconds])
 
   useEffect(() => {
-    if (gameState === "correct") {
-      const timer = setTimeout(() => {
-        setGameState("memorize")
-      }, 1000)
-      return () => clearTimeout(timer)
-    }
-  }, [gameState])
+    if (phase !== "correct") return
+    const id = window.setTimeout(() => setPhase("memorize"), 900)
+    return () => window.clearTimeout(id)
+  }, [phase])
 
-  const generateRandomNumber = (digits: number): string => {
-    return Math.floor(Math.random() * 10 ** digits)
-      .toString()
-      .padStart(digits, "0")
+  const start = () => {
+    setDigits(startingDigits)
+    setRoundsWon(0)
+    setAnswer("")
+    setIsNewBest(false)
+    setPhase("memorize")
   }
 
-  const handleStartGame = () => {
-    setScore(startingDigits)
-    setGameState("memorize")
-  }
-
-  const handleSubmit = () => {
-    setLastInput(userInput)
-    if (userInput === currentNumber) {
-      setScore((prevScore) => prevScore + 1)
-      setGameState("correct")
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setLastAnswer(answer)
+    setAnswer("")
+    if (answer === currentNumber) {
+      setRoundsWon((r) => r + 1)
+      setDigits((d) => d + 1)
+      setPhase("correct")
     } else {
-      setGameState("result")
+      const recalled = roundsWon > 0 ? digits - 1 : 0
+      setIsNewBest(recalled > 0 && submit(recalled))
+      setPhase("result")
     }
-    setUserInput("")
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserInput(e.target.value)
-  }
-
-  const renderDigitButtons = () => {
-    return (
-      <div className="grid grid-cols-4 gap-2">
-        {[...Array(16)].map((_, i) => (
-          <button
-            key={i + 1}
-            onClick={() => setStartingDigits(i + 1)}
-            className={`py-2 px-4 rounded font-bold transition-all duration-300 ${
-              startingDigits === i + 1
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </div>
-    )
-  }
+  const recalled = roundsWon > 0 ? digits - 1 : 0
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex flex-col items-center justify-center p-4">
-      <header className="w-full max-w-4xl mx-auto px-4 py-6 mb-8">
-        <nav className="flex justify-between items-center">
-          <Link
-            href="/"
-            className="text-2xl font-bold text-white flex items-center"
-          >
-            <GiBrain className="mr-2 text-3xl" />
-            MemoryMaster
-          </Link>
-        </nav>
-      </header>
-      <div className="bg-white bg-opacity-90 backdrop-blur-lg rounded-2xl shadow-2xl p-8 w-fit">
-        {gameState === "setup" && (
-          <>
-            <h1 className="text-3xl font-extrabold text-blue-600 mb-6">
-              Number Memory Game
-            </h1>
-            <div className="mb-6">
-              <label className="block text-lg font-semibold text-gray-700 mb-3">
-                Select starting number of digits:
-              </label>
-              {renderDigitButtons()}
-            </div>
-
-            <div className="mt-8">
-              <label className="block text-lg font-semibold text-gray-700 mb-3">
-                Select memorization time:
-              </label>
-              <div className="flex items-center space-x-4 mb-6">
-                <input
-                  type="range"
-                  min={1}
-                  max={10}
-                  value={selectedTime / 10}
-                  onChange={(e) =>
-                    setSelectedTime(parseInt(e.target.value) * 10)
-                  }
-                  className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer"
-                />
-                <span className="text-xl font-bold text-blue-600">
-                  {selectedTime / 10}s
-                </span>
-              </div>
-            </div>
-            <button
-              onClick={handleStartGame}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
-            >
-              Start Game
-            </button>
-          </>
-        )}
-
-        {gameState === "memorize" && (
-          <div className="text-center w-full max-w-4xl mx-auto px-4">
-            <h2 className="text-2xl font-bold mb-6 text-blue-600">
-              Memorize this number:
-            </h2>
-            <div className="overflow-x-auto mb-6 py-2">
-              <p className="text-4xl md:text-4xl lg:text-5xl font-extrabold text-blue-600 whitespace-nowrap inline-block leading-normal">
-                {currentNumber}
-              </p>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
-              <div
-                className="bg-gradient-to-r from-blue-600 to-purple-600 h-3 rounded-full transition-all duration-100 ease-linear"
-                style={{ width: `${timeRemaining}%` }}
-              ></div>
-            </div>
-          </div>
-        )}
-
-        {gameState === "input" && (
-          <div>
-            <h2 className="text-2xl font-bold mb-6 text-blue-600">
-              Enter the number you memorized:
-            </h2>
-            <input
-              type="number"
-              value={userInput}
-              onChange={handleInputChange}
-              className="w-full p-3 border-2 border-blue-300 rounded-lg mb-6 text-xl [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus:outline-none focus:border-blue-500"
-              autoFocus
+    <GameShell gameId="number" best={best}>
+      {phase === "setup" && (
+        <Panel className="space-y-6">
+          <p className="text-muted">
+            A number flashes on screen. Type it back from memory. Every correct
+            answer adds one more digit.
+          </p>
+          <Field label="Starting digits" hint={startingDigits}>
+            <SegmentedControl<number>
+              label="Starting digits"
+              columns={8}
+              value={startingDigits}
+              onChange={setStartingDigits}
+              options={Array.from({ length: 16 }, (_, i) => ({
+                value: i + 1,
+                label: i + 1,
+              }))}
             />
-            <button
-              onClick={handleSubmit}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
-            >
+          </Field>
+          <Field label="Time to memorize" hint={`${memorizeSeconds}s`}>
+            <Slider
+              label="Time to memorize, in seconds"
+              min={1}
+              max={10}
+              value={memorizeSeconds}
+              onChange={setMemorizeSeconds}
+            />
+          </Field>
+          <Button fullWidth onClick={start}>
+            Start
+          </Button>
+        </Panel>
+      )}
+
+      {phase === "memorize" && (
+        <Panel className="space-y-8 text-center">
+          <p className="text-sm font-medium text-muted">
+            Memorize this {digits}-digit number
+          </p>
+          <p className="break-all font-mono text-4xl font-semibold tracking-[0.15em] sm:text-5xl">
+            {currentNumber}
+          </p>
+          <ProgressBar value={remaining} label="Time remaining" />
+        </Panel>
+      )}
+
+      {phase === "input" && (
+        <Panel>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <label htmlFor="answer" className="block text-center text-sm font-medium text-muted">
+              What was the number?
+            </label>
+            <input
+              id="answer"
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value.replace(/\D/g, ""))}
+              inputMode="numeric"
+              autoComplete="off"
+              autoFocus
+              className="focus-ring h-16 w-full rounded-xl border border-line bg-surface px-4 text-center font-mono text-3xl tracking-[0.15em]"
+            />
+            <Button type="submit" fullWidth disabled={!answer}>
               Submit
-            </button>
-          </div>
-        )}
+            </Button>
+          </form>
+        </Panel>
+      )}
 
-        {gameState === "correct" && (
-          <div className="text-center">
-            <CheckCircle className="mx-auto text-green-500" size={80} />
-            <p className="text-3xl font-bold text-green-600 mt-6">Correct!</p>
-          </div>
-        )}
+      {phase === "correct" && (
+        <Panel className="flex flex-col items-center gap-4 py-12 text-center">
+          <span className="flex h-14 w-14 animate-pop items-center justify-center rounded-full bg-good-soft text-good">
+            <Check size={28} aria-hidden />
+          </span>
+          <p className="text-xl font-semibold">Correct</p>
+          <p className="text-sm text-muted">Next up: {digits} digits</p>
+        </Panel>
+      )}
 
-        {gameState === "result" && (
-          <div className="text-center">
-            <XCircle className="mx-auto text-red-500" size={80} />
-            <h2 className="text-3xl font-bold text-red-600 mb-6">Game Over!</h2>
-            <p className="text-2xl mb-4">
-              Your score:{" "}
-              <span className="font-bold text-blue-600">{score} digits</span>
-            </p>
-            <p className="text-xl mb-4 text-gray-500">
-              The average score is{" "}
-              <span className="font-bold text-blue-400">7 digits</span>
-            </p>
-            <p className="text-xl mb-4">
-              The correct number was:{" "}
-              <span className="font-bold text-green-600">{currentNumber}</span>
-            </p>
-            <p className="text-xl mb-6">
-              You entered:{" "}
-              <span className="font-bold text-red-600">{lastInput}</span>
-            </p>
-            <button
-              onClick={() => setGameState("setup")}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
-            >
-              Play Again
-            </button>
+      {phase === "result" && (
+        <Panel className="space-y-8">
+          <ResultHeader
+            eyebrow="You recalled"
+            title={`${recalled} digit${recalled === 1 ? "" : "s"}`}
+            description="Most people can hold about 7 digits in short-term memory."
+            newBest={isNewBest}
+          />
+          <dl className="space-y-3 rounded-xl bg-surface-2 p-4 text-center">
+            <div>
+              <dt className="text-xs font-medium uppercase tracking-wide text-muted">
+                Number
+              </dt>
+              <dd className="mt-1 break-all font-mono text-xl tracking-[0.1em]">
+                {currentNumber}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs font-medium uppercase tracking-wide text-muted">
+                Your answer
+              </dt>
+              <dd className="mt-1 break-all font-mono text-xl tracking-[0.1em]">
+                {lastAnswer.split("").map((d, i) => (
+                  <span key={i} className={cx(d === currentNumber[i] ? "text-good" : "text-bad")}>
+                    {d}
+                  </span>
+                ))}
+              </dd>
+            </div>
+          </dl>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Button fullWidth onClick={start}>
+              Play again
+            </Button>
+            <Button fullWidth variant="secondary" onClick={() => setPhase("setup")}>
+              Change settings
+            </Button>
           </div>
-        )}
-      </div>
-    </div>
+        </Panel>
+      )}
+    </GameShell>
   )
 }
 
-export default GamePage
+export default NumberGamePage

@@ -25,7 +25,7 @@ export const games: GameMeta[] = [
     id: "sequence",
     title: "Sequence Memory",
     href: "/sequence",
-    skill: "Order",
+    skill: "Sequence memory",
     description:
       "Tiles light up one after another. Repeat the pattern. It grows by one every round.",
     icon: Workflow,
@@ -37,7 +37,7 @@ export const games: GameMeta[] = [
     id: "card-match",
     title: "Card Match",
     href: "/card-match",
-    skill: "Visual",
+    skill: "Visual memory",
     description:
       "Flip cards two at a time and find every pair in as few moves as you can.",
     icon: Layers,
@@ -50,7 +50,7 @@ export const games: GameMeta[] = [
     id: "word-recall",
     title: "Word Recall",
     href: "/word-recall",
-    skill: "Verbal",
+    skill: "Verbal memory",
     description:
       "Study a list of words, then type back as many as you can remember.",
     icon: ListChecks,
@@ -64,7 +64,7 @@ export const games: GameMeta[] = [
     id: "number",
     title: "Number Memory",
     href: "/game",
-    skill: "Short-term",
+    skill: "Short-term memory",
     description:
       "Memorize a number before it disappears. Each correct answer adds a digit.",
     icon: Binary,
@@ -75,7 +75,7 @@ export const games: GameMeta[] = [
     id: "box",
     title: "Box Memory",
     href: "/box-game",
-    skill: "Spatial",
+    skill: "Spatial memory",
     description:
       "Remember which squares lit up on the grid, then pick them all out.",
     icon: Grid3x3,
@@ -86,7 +86,7 @@ export const games: GameMeta[] = [
     id: "anagrams",
     title: "Anagrams",
     href: "/anagrams",
-    skill: "Word play",
+    skill: "Word skills",
     description:
       "Make as many words as you can from six letters before the minute runs out.",
     icon: Shuffle,

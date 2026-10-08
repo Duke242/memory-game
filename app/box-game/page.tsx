@@ -1,12 +1,26 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { Check, X } from "lucide-react"
-import { GiBrain } from "react-icons/gi"
-import Link from "next/link"
 import toast from "react-hot-toast"
+import GameShell from "@/components/game/GameShell"
+import {
+  Button,
+  Field,
+  Panel,
+  ProgressBar,
+  ResultHeader,
+  SegmentedControl,
+  Slider,
+  Stat,
+  cx,
+} from "@/components/game/ui"
+import { useBestScore } from "@/libs/useBestScore"
 
 type GameState = "setup" | "display" | "recall" | "result"
+
+const getMaxColoredBoxes = (gridSize: number) =>
+  Math.min(Math.floor(gridSize * gridSize * 0.8), 20)
 
 const BoxGamePage: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>("setup")
@@ -17,97 +31,78 @@ const BoxGamePage: React.FC = () => {
   const [timeRemaining, setTimeRemaining] = useState<number>(100)
   const [displayTime, setDisplayTime] = useState<number>(3)
   const [score, setScore] = useState<number>(0)
-  const [stats, setStats] = useState<{
-    correct: number
-    incorrect: number
-    missed: number
-  }>({
-    correct: 0,
-    incorrect: 0,
-    missed: 0,
-  })
-
-  const getMaxColoredBoxes = (gridSize: number) => {
-    return Math.min(Math.floor(gridSize * gridSize * 0.8), 20)
-  }
+  const [stats, setStats] = useState({ correct: 0, incorrect: 0, missed: 0 })
+  const [isNewBest, setIsNewBest] = useState(false)
+  const { best, submit } = useBestScore("box")
 
   useEffect(() => {
-    if (gameState === "display") {
-      const newColoredBoxes = Array(difficulty * difficulty).fill(false)
-
-      let remainingBoxes = numColoredBoxes
-      while (remainingBoxes > 0) {
-        const randomIndex = Math.floor(
-          Math.random() * (difficulty * difficulty)
-        )
-        if (!newColoredBoxes[randomIndex]) {
-          newColoredBoxes[randomIndex] = true
-          remainingBoxes--
-        }
+    if (gameState !== "display") return
+    const total = difficulty * difficulty
+    const newColoredBoxes = Array(total).fill(false)
+    let remainingBoxes = numColoredBoxes
+    while (remainingBoxes > 0) {
+      const randomIndex = Math.floor(Math.random() * total)
+      if (!newColoredBoxes[randomIndex]) {
+        newColoredBoxes[randomIndex] = true
+        remainingBoxes--
       }
-
-      setColoredBoxes(newColoredBoxes)
-      setUserSelection(Array(difficulty * difficulty).fill(false))
-      setTimeRemaining(100)
-
-      const timer = setInterval(() => {
-        setTimeRemaining((prevTime) => {
-          if (prevTime <= 0) {
-            clearInterval(timer)
-            setGameState("recall")
-            return 0
-          }
-          return prevTime - 100 / (displayTime * 10)
-        })
-      }, 100)
-
-      return () => clearInterval(timer)
     }
+    setColoredBoxes(newColoredBoxes)
+    setUserSelection(Array(total).fill(false))
+    setTimeRemaining(100)
+
+    const startedAt = Date.now()
+    const timer = window.setInterval(() => {
+      const left = 100 - ((Date.now() - startedAt) / (displayTime * 1000)) * 100
+      if (left <= 0) {
+        window.clearInterval(timer)
+        setGameState("recall")
+      }
+      setTimeRemaining(Math.max(0, left))
+    }, 50)
+    return () => window.clearInterval(timer)
   }, [gameState, difficulty, displayTime, numColoredBoxes])
 
   const handleStartGame = () => {
+    setIsNewBest(false)
     setGameState("display")
   }
 
   const handleBoxClick = (index: number) => {
-    if (gameState === "recall") {
-      setUserSelection((prev) => {
-        const newSelection = [...prev]
-        newSelection[index] = !newSelection[index]
-        return newSelection
-      })
-    }
+    if (gameState !== "recall") return
+    setUserSelection((prev) => {
+      const next = [...prev]
+      next[index] = !next[index]
+      return next
+    })
   }
 
   const handleSubmit = () => {
     let correct = 0
     let incorrect = 0
     let missed = 0
-
     coloredBoxes.forEach((isColored, index) => {
       if (isColored) {
-        if (userSelection[index]) {
-          correct++
-        } else {
-          missed++
-        }
-      } else {
-        if (userSelection[index]) {
-          incorrect++
-        }
+        if (userSelection[index]) correct++
+        else missed++
+      } else if (userSelection[index]) {
+        incorrect++
       }
     })
 
-    const percentage = Math.round((correct / numColoredBoxes) * 100)
+    // Wrong picks cancel out right ones, so selecting everything can't score 100%.
+    const percentage = Math.round(
+      (Math.max(0, correct - incorrect) / numColoredBoxes) * 100
+    )
     setScore(percentage)
     setStats({ correct, incorrect, missed })
-
+    setIsNewBest(percentage === 100 && submit(numColoredBoxes))
     setGameState("result")
   }
 
   const nextLevelPressed = () => {
     let newDifficulty = difficulty
-    let newNumColoredBoxes = numColoredBoxes + 1
+    const newNumColoredBoxes = numColoredBoxes + 1
 
     if (difficulty === 3 && numColoredBoxes >= 7) {
       newDifficulty = 4
@@ -117,253 +112,164 @@ const BoxGamePage: React.FC = () => {
       toast.success("Congratulations! You've beaten the highest level!", {
         duration: 3000,
         position: "top-center",
-        style: {
-          background: "#4CAF50",
-          color: "#fff",
-        },
       })
-
       setGameState("setup")
       return
     }
 
     setDifficulty(newDifficulty)
     setNumColoredBoxes(newNumColoredBoxes)
-
+    setIsNewBest(false)
     setGameState("display")
   }
 
-  const renderGrid = (boxes: boolean[]) => {
-    return (
-      <div
-        className="grid gap-2 mb-4"
-        style={{
-          gridTemplateColumns: `repeat(${difficulty}, minmax(0, 1fr))`,
-        }}
-      >
-        {boxes.map((isColored, index) => {
-          const isCorrect = coloredBoxes[index] === userSelection[index]
-          const showFeedback = gameState === "result"
+  const selectedCount = userSelection.filter(Boolean).length
 
-          return (
-            <div
-              key={index}
-              className={`aspect-square rounded-md flex items-center justify-center relative ${
-                gameState === "display" && isColored
-                  ? "bg-blue-500"
-                  : gameState === "recall"
-                  ? userSelection[index]
-                    ? "bg-blue-300"
-                    : "bg-gray-200 hover:bg-gray-300 cursor-pointer"
-                  : gameState === "result"
-                  ? isCorrect
-                    ? userSelection[index]
-                      ? "bg-green-200"
-                      : "bg-gray-200"
-                    : userSelection[index]
-                    ? "bg-red-200"
-                    : coloredBoxes[index]
-                    ? "bg-blue-200"
-                    : "bg-gray-200"
-                  : "bg-gray-200"
-              }`}
-              onClick={() => handleBoxClick(index)}
-            >
-              {showFeedback && (
-                <>
-                  {userSelection[index] !== coloredBoxes[index] && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      {userSelection[index] ? (
-                        <X className="text-red-500" size={24} />
-                      ) : coloredBoxes[index] ? (
-                        <div className="w-4 h-4 rounded-full border-2 border-blue-500" />
-                      ) : null}
-                    </div>
-                  )}
-                  {isCorrect && userSelection[index] && (
-                    <Check className="text-green-500" size={24} />
-                  )}
-                </>
-              )}
-            </div>
-          )
-        })}
-      </div>
-    )
-  }
+  const renderGrid = () => (
+    <div
+      className="mx-auto grid max-w-sm gap-2"
+      style={{ gridTemplateColumns: `repeat(${difficulty}, minmax(0, 1fr))` }}
+    >
+      {coloredBoxes.map((isColored, index) => {
+        const selected = userSelection[index]
+        const showResult = gameState === "result"
+        return (
+          <button
+            key={index}
+            type="button"
+            aria-label={`Box ${index + 1}`}
+            aria-pressed={gameState === "recall" ? selected : undefined}
+            disabled={gameState !== "recall"}
+            onClick={() => handleBoxClick(index)}
+            className={cx(
+              "focus-ring relative flex aspect-square items-center justify-center rounded-lg transition-colors duration-150 disabled:cursor-default",
+              gameState === "display" && (isColored ? "bg-brand" : "bg-surface-2"),
+              gameState === "recall" &&
+                (selected ? "bg-brand" : "bg-surface-2 hover:bg-line"),
+              showResult &&
+                (isColored && selected
+                  ? "bg-good-soft text-good"
+                  : selected
+                  ? "bg-bad-soft text-bad"
+                  : isColored
+                  ? "border-2 border-dashed border-brand/60 bg-brand-soft"
+                  : "bg-surface-2")
+            )}
+          >
+            {showResult && isColored && selected && <Check size={20} aria-hidden />}
+            {showResult && !isColored && selected && <X size={20} aria-hidden />}
+          </button>
+        )
+      })}
+    </div>
+  )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex flex-col items-center justify-center p-4">
-      <header className="w-full max-w-4xl mx-auto px-4 py-6 mb-8">
-        <nav className="flex justify-between items-center">
-          <Link
-            href="/"
-            className="text-2xl font-bold text-white flex items-center"
-          >
-            <GiBrain className="mr-2 text-3xl" />
-            MemoryMaster
-          </Link>
-        </nav>
-      </header>
-      <div className="bg-white bg-opacity-90 backdrop-blur-lg rounded-2xl shadow-2xl p-8 max-w-md w-full">
-        {gameState === "setup" && (
-          <>
-            <h1 className="text-3xl font-extrabold text-blue-600 mb-6">
-              Box Memory Game
-            </h1>
-            <div className="mb-6">
-              <label className="block text-lg font-semibold text-gray-700 mb-3">
-                Select grid size:
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {[3, 4, 5].map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => {
-                      setDifficulty(size)
-                      setNumColoredBoxes(Math.min(3, getMaxColoredBoxes(size)))
-                    }}
-                    className={`py-2 px-4 rounded font-bold ${
-                      difficulty === size
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
-                  >
-                    {size}x{size}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="mb-6">
-              <label className="block text-lg font-semibold text-gray-700 mb-3">
-                Number of colored boxes:
-              </label>
-              <div className="flex items-center space-x-4">
-                <input
-                  type="range"
-                  min={1}
-                  max={getMaxColoredBoxes(difficulty)}
-                  value={numColoredBoxes}
-                  onChange={(e) => setNumColoredBoxes(parseInt(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer"
-                />
-                <span className="text-xl font-bold text-blue-600">
-                  {numColoredBoxes}
-                </span>
-              </div>
-            </div>
-            <div className="mb-6">
-              <label className="block text-lg font-semibold text-gray-700 mb-3">
-                Select display time:
-              </label>
-              <div className="flex items-center space-x-4">
-                <input
-                  type="range"
-                  min={1}
-                  max={10}
-                  value={displayTime}
-                  onChange={(e) => setDisplayTime(parseInt(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer"
-                />
-                <span className="text-xl font-bold text-blue-600">
-                  {displayTime}s
-                </span>
-              </div>
-            </div>
-            <button
-              onClick={handleStartGame}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
-            >
-              Start Game
-            </button>
-          </>
-        )}
+    <GameShell gameId="box" best={best}>
+      {gameState === "setup" && (
+        <Panel className="space-y-6">
+          <p className="text-muted">
+            Some boxes light up for a moment. Once they go dark, pick out every
+            one that was lit.
+          </p>
+          <Field label="Grid size">
+            <SegmentedControl<number>
+              label="Grid size"
+              value={difficulty}
+              onChange={(size) => {
+                setDifficulty(size)
+                setNumColoredBoxes(Math.min(3, getMaxColoredBoxes(size)))
+              }}
+              options={[3, 4, 5].map((size) => ({
+                value: size,
+                label: `${size}×${size}`,
+              }))}
+            />
+          </Field>
+          <Field label="Lit boxes" hint={numColoredBoxes}>
+            <Slider
+              label="Number of lit boxes"
+              min={1}
+              max={getMaxColoredBoxes(difficulty)}
+              value={numColoredBoxes}
+              onChange={setNumColoredBoxes}
+            />
+          </Field>
+          <Field label="Display time" hint={`${displayTime}s`}>
+            <Slider
+              label="Display time, in seconds"
+              min={1}
+              max={10}
+              value={displayTime}
+              onChange={setDisplayTime}
+            />
+          </Field>
+          <Button fullWidth onClick={handleStartGame}>
+            Start
+          </Button>
+        </Panel>
+      )}
 
-        {gameState === "display" && (
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-6 text-blue-600">
-              Memorize blue boxes:
-            </h2>
-            {renderGrid(coloredBoxes)}
-            <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
-              <div
-                className="bg-gradient-to-r from-blue-600 to-purple-600 h-3 rounded-full transition-all duration-100 ease-linear"
-                style={{ width: `${timeRemaining}%` }}
-              ></div>
-            </div>
-          </div>
-        )}
+      {gameState === "display" && (
+        <Panel className="space-y-6">
+          <p className="text-center text-sm font-medium text-muted">
+            Memorize the {numColoredBoxes} lit boxes
+          </p>
+          {renderGrid()}
+          <ProgressBar value={timeRemaining} label="Time remaining" />
+        </Panel>
+      )}
 
-        {gameState === "recall" && (
-          <div>
-            <h2 className="text-2xl font-bold mb-6 text-blue-600">
-              Select the blue boxes:
-            </h2>
-            {renderGrid(userSelection)}
-            <button
-              onClick={handleSubmit}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
-            >
-              Submit
-            </button>
-          </div>
-        )}
+      {gameState === "recall" && (
+        <Panel className="space-y-6">
+          <p className="text-center text-sm font-medium text-muted">
+            Select the boxes that were lit ·{" "}
+            <span className="tabular-nums text-ink">
+              {selectedCount} / {numColoredBoxes}
+            </span>
+          </p>
+          {renderGrid()}
+          <Button fullWidth onClick={handleSubmit}>
+            Check
+          </Button>
+        </Panel>
+      )}
 
-        {gameState === "result" && (
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-blue-600 mb-6">
-              {score === 100 ? "Perfect Score!" : "Results"}
-            </h2>
-            {renderGrid(userSelection)}
-            <div className="mb-6">
-              <p className="text-xl font-semibold text-gray-700 mb-2">
-                Score: {score}%
-              </p>
-              <div className="text-sm text-gray-600 space-y-1">
-                <p>Correct selections: {stats.correct}</p>
-                <p>Incorrect selections: {stats.incorrect}</p>
-                <p>Missed boxes: {stats.missed}</p>
-              </div>
-              {score === 100 && (
-                <p className="text-green-600 font-semibold mt-2">
-                  Great job! Next level will have {numColoredBoxes + 1} boxes to
-                  remember.
-                </p>
-              )}
-              <div className="flex items-center justify-center space-x-6 text-sm text-gray-600 mt-4">
-                <div className="flex items-center">
-                  <div className="w-4 h-4 bg-green-200 rounded-md mr-2"></div>
-                  <span>Correct</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-4 h-4 bg-red-200 rounded-md mr-2"></div>
-                  <span>Incorrect</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-4 h-4 bg-blue-200 rounded-md mr-2"></div>
-                  <span>Missed</span>
-                </div>
-              </div>
-            </div>
-            {score === 100 ? (
-              <button
-                onClick={nextLevelPressed}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
-              >
-                Next Level
-              </button>
-            ) : (
-              <button
-                onClick={() => setGameState("setup")}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
-              >
-                Play Again
-              </button>
-            )}
+      {gameState === "result" && (
+        <Panel className="space-y-8">
+          <ResultHeader
+            eyebrow={score === 100 ? "Perfect" : "Your score"}
+            title={`${score}%`}
+            description={
+              score === 100
+                ? `All ${numColoredBoxes} boxes. Next level has ${numColoredBoxes + 1}.`
+                : "Green were right, red were wrong, dashed ones were missed."
+            }
+            newBest={isNewBest}
+          />
+          {renderGrid()}
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+            <Stat label="Correct" value={stats.correct} tone="good" />
+            <Stat label="Wrong" value={stats.incorrect} tone={stats.incorrect ? "bad" : "neutral"} />
+            <Stat label="Missed" value={stats.missed} />
           </div>
-        )}
-      </div>
-    </div>
+          {score === 100 ? (
+            <Button fullWidth onClick={nextLevelPressed}>
+              Next level
+            </Button>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Button fullWidth onClick={handleStartGame}>
+                Try again
+              </Button>
+              <Button fullWidth variant="secondary" onClick={() => setGameState("setup")}>
+                Change settings
+              </Button>
+            </div>
+          )}
+        </Panel>
+      )}
+    </GameShell>
   )
 }
 

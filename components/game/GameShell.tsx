@@ -46,7 +46,7 @@ const GameShell = ({
               <h1 className="truncate text-xl font-semibold tracking-tight">
                 {game.title}
               </h1>
-              <p className="text-sm text-muted">{game.skill} memory</p>
+              <p className="text-sm text-muted">{game.skill}</p>
             </div>
           </div>
           <div
