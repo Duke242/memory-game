@@ -2,14 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Design tokens (RGB channels, consumed by tailwind.config.js colors). */
+:root {
+  --mm-canvas: 247 247 251;
+  --mm-surface: 255 255 255;
+  --mm-surface-2: 240 241 247;
+  --mm-line: 226 228 238;
+  --mm-ink: 18 19 38;
+  --mm-muted: 98 102 128;
+  --mm-brand: 88 72 238;
+  --mm-brand-ink: 79 62 222;
+  --mm-brand-soft: 236 233 254;
+  --mm-good: 21 128 61;
+  --mm-good-soft: 220 247 229;
+  --mm-bad: 200 30 30;
+  --mm-bad-soft: 254 228 228;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --mm-canvas: 11 11 19;
+    --mm-surface: 21 21 33;
+    --mm-surface-2: 31 31 47;
+    --mm-line: 45 46 66;
+    --mm-ink: 237 237 246;
+    --mm-muted: 152 154 182;
+    --mm-brand: 106 90 250;
+    --mm-brand-ink: 168 158 255;
+    --mm-brand-soft: 38 34 78;
+    --mm-good: 74 222 128;
+    --mm-good-soft: 20 56 38;
+    --mm-bad: 248 113 113;
+    --mm-bad-soft: 72 26 30;
+    color-scheme: dark;
+  }
+}
+
 html,
 body {
   scroll-behavior: smooth !important;
 }
 
+/* html[data-theme] outranks daisyUI's [data-theme] background. */
+html[data-theme],
+body {
+  @apply bg-canvas text-ink antialiased;
+}
+
 /* It makes the HTML progress bar filling smooth when value change. */
 progress::-webkit-progress-value {
   transition: 0.6s width ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body {
+    scroll-behavior: auto !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 @layer base {
@@ -18,5 +75,11 @@ progress::-webkit-progress-value {
   }
   .btn {
     @apply !capitalize;
+  }
+}
+
+@layer components {
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-canvas;
   }
 }

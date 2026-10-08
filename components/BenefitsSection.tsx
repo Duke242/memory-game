@@ -1,65 +1,52 @@
 import React from "react"
-import {
-  GiBrain,
-  GiMagnifyingGlass,
-  GiLightningArc,
-  GiPuzzle,
-} from "react-icons/gi"
+import { Eye, Layers, Timer, Target } from "lucide-react"
 
 const benefits = [
   {
-    title: "Boost Visual Memory",
-    icon: GiBrain,
-    description:
-      "Enhance your ability to recall visual patterns and spatial information.",
+    title: "Visual memory",
+    icon: Eye,
+    description: "Hold patterns and positions in mind with Box Memory and Card Match.",
   },
   {
-    title: "Sharpen Focus",
-    icon: GiMagnifyingGlass,
-    description:
-      "Improve concentration and attention to detail through engaging challenges.",
+    title: "Working memory",
+    icon: Layers,
+    description: "Keep growing sequences, numbers and word lists in order.",
   },
   {
-    title: "Quick Thinking",
-    icon: GiLightningArc,
-    description:
-      "Develop faster cognitive processing and decision-making skills.",
+    title: "Quick thinking",
+    icon: Timer,
+    description: "Timed rounds push you to recall and decide under pressure.",
   },
   {
-    title: "Mental Flexibility",
-    icon: GiPuzzle,
-    description:
-      "Adapt to varying difficulty levels, improving your cognitive adaptability.",
+    title: "Focus",
+    icon: Target,
+    description: "Short, distraction-free rounds that reward full attention.",
   },
 ]
 
-const BenefitsSection = () => {
-  return (
-    <section className="bg-white text-gray-800 py-16">
-      <div className="container mx-auto px-4">
-        <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-12 text-blue-600">
-          Unlock Your Mind&apos;s Potential
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {benefits.map((benefit, index) => (
-            <div
-              key={index}
-              className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-105 animate-fade-in-up"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <div className="text-5xl mb-4 text-blue-600">
-                <benefit.icon />
-              </div>
-              <h3 className="text-xl font-bold mb-2 text-blue-700">
-                {benefit.title}
-              </h3>
-              <p className="text-gray-600">{benefit.description}</p>
-            </div>
-          ))}
-        </div>
+const BenefitsSection = () => (
+  <section id="benefits" className="scroll-mt-20 py-16 sm:py-20">
+    <div className="mx-auto max-w-6xl px-4">
+      <div className="mb-10 max-w-2xl">
+        <h2 className="text-3xl font-bold tracking-tight">Why it works</h2>
+        <p className="mt-3 text-muted">
+          Memory improves with practice. Each game trains a different skill, and
+          adjustable difficulty keeps you at the edge of what you can do.
+        </p>
       </div>
-    </section>
-  )
-}
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {benefits.map((benefit) => (
+          <div key={benefit.title} className="rounded-2xl border border-line bg-surface p-6">
+            <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-soft text-brand-ink">
+              <benefit.icon size={20} aria-hidden />
+            </span>
+            <h3 className="font-semibold">{benefit.title}</h3>
+            <p className="mt-2 text-sm text-muted">{benefit.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+)
 
 export default BenefitsSection

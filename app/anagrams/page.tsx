@@ -1,386 +1,264 @@
 "use client"
 
-import React, { useState, useEffect, useRef } from "react"
-import { anagrams } from "./lettersAndWords"
-import Link from "next/link"
-import { GiBrain } from "react-icons/gi"
-import toast, { Toaster } from "react-hot-toast"
-import AnimatedScore from "@/components/AnimatedScore"
-import GameOverModal from "@/components/GameOverModal"
+import React, { useEffect, useRef, useState } from "react"
 import { Shuffle } from "lucide-react"
+import GameShell from "@/components/game/GameShell"
+import { Button, Panel, ProgressBar, ResultHeader, Stat, cx } from "@/components/game/ui"
+import { shuffle } from "@/libs/shuffle"
+import { useBestScore } from "@/libs/useBestScore"
+import { anagrams } from "./lettersAndWords"
+
+const GAME_SECONDS = 60
+const letterSets = Object.keys(anagrams) as (keyof typeof anagrams)[]
 
 interface GameState {
   letters: string
   shuffledLetters: string
   userGuess: string
   score: number
-  message: string
-  isCorrect: boolean
   timeLeft: number
   isGameActive: boolean
   hasStarted: boolean
-  usedWords: Set<string>
+  usedWords: string[]
   randomIndex: number
+}
+
+type Feedback = { ok: boolean; text: string } | null
+
+const shuffleLetters = (letters: string): string =>
+  shuffle(letters.split("")).join("")
+
+const newGame = (): GameState => {
+  const randomIndex = Math.floor(Math.random() * letterSets.length)
+  const letters = letterSets[randomIndex]
+  return {
+    randomIndex,
+    letters,
+    shuffledLetters: shuffleLetters(letters),
+    userGuess: "",
+    score: 0,
+    timeLeft: GAME_SECONDS,
+    isGameActive: true,
+    hasStarted: false,
+    usedWords: [],
+  }
+}
+
+const getWordScore = (length: number): number => {
+  switch (length) {
+    case 3:
+      return 100
+    case 4:
+      return 400
+    case 5:
+      return 1200
+    case 6:
+      return 2000
+    default:
+      return 0
+  }
 }
 
 const Anagrams: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null)
+  const [feedback, setFeedback] = useState<Feedback>(null)
+  const [isNewBest, setIsNewBest] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const { best, submit } = useBestScore("anagrams")
 
-  const shuffleLetters = (letters: string): string => {
-    const array = letters.split("")
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-      ;[array[i], array[j]] = [array[j], array[i]]
-    }
-    return array.join("")
-  }
-  const getRandomIndex = () => {
-    return Math.floor(Math.random() * Object.keys(anagrams).length)
-  }
-
-  useEffect(() => {
-    const randomIndex = getRandomIndex()
-    const initialLetters = Object.keys(anagrams)[randomIndex]
-    const initialState: GameState = {
-      letters: initialLetters,
-      shuffledLetters: shuffleLetters(initialLetters),
-      userGuess: "",
-      score: 0,
-      message: "",
-      isCorrect: false,
-      timeLeft: 60,
-      isGameActive: true,
-      hasStarted: false,
-      usedWords: new Set<string>(),
-      randomIndex,
-    }
-    setGameState(initialState)
-  }, [])
-
-  useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === "Enter" && gameState?.isGameActive) {
-        handleSubmit()
-      }
-    }
-
-    window.addEventListener("keypress", handleKeyPress)
-
-    return () => {
-      window.removeEventListener("keypress", handleKeyPress)
-    }
-  }, [gameState])
+  // Pick letters on the client to avoid a server/client mismatch.
+  useEffect(() => setGameState(newGame()), [])
 
   useEffect(() => {
     if (!gameState?.isGameActive || !gameState?.hasStarted) return
-
-    const timer = setInterval(() => {
+    const timer = window.setInterval(() => {
       setGameState((prev) => {
         if (!prev) return prev
-
-        const newTimeLeft = prev.timeLeft - 1
-        if (newTimeLeft <= 0) {
-          clearInterval(timer)
+        const timeLeft = prev.timeLeft - 1
+        if (timeLeft <= 0) {
+          window.clearInterval(timer)
           return { ...prev, timeLeft: 0, isGameActive: false }
         }
-        return { ...prev, timeLeft: newTimeLeft }
+        return { ...prev, timeLeft }
       })
     }, 1000)
-
-    return () => clearInterval(timer)
+    return () => window.clearInterval(timer)
   }, [gameState?.isGameActive, gameState?.hasStarted])
 
-  const handleShuffle = (): void => {
-    if (!gameState || !gameState.isGameActive) return
-
-    setGameState((prev) => ({
-      ...prev!,
-      shuffledLetters: shuffleLetters(prev!.letters),
-    }))
-    inputRef.current?.focus()
-  }
-
-  const startNewGame = (): void => {
-    const randomIndex = getRandomIndex()
-    const letters = Object.keys(anagrams)[randomIndex]
-    const newState: GameState = {
-      randomIndex,
-      letters,
-      shuffledLetters: shuffleLetters(letters),
-      userGuess: "",
-      score: 0,
-      message: "",
-      isCorrect: false,
-      timeLeft: 60,
-      isGameActive: true,
-      hasStarted: false,
-      usedWords: new Set<string>(),
-    }
-    setGameState(newState)
-    setTimeout(() => {
-      inputRef.current?.focus()
-    }, 0)
-  }
-
-  const checkWord = (word: string): boolean => {
-    const lowerCaseWord = word.toLowerCase()
-    if (lowerCaseWord.length >= 3 && lowerCaseWord.length <= 6) {
-      const currentWordSetKey = Object.keys(anagrams)[gameState.randomIndex]
-      const currentWordList =
-        anagrams[currentWordSetKey as keyof typeof anagrams]
-      return currentWordList.includes(lowerCaseWord)
-    }
-    return false
-  }
-
-  const getWordScore = (length: number): number => {
-    switch (length) {
-      case 3:
-        return 100
-      case 4:
-        return 400
-      case 5:
-        return 1200
-      case 6:
-        return 2000
-      default:
-        return 0
-    }
-  }
-
-  const isValidWord = (word: string): boolean => {
-    return word.length >= 3 && word.length <= 6
-  }
-
-  const handleSubmit = (): void => {
-    if (!gameState || !gameState.isGameActive) return
-
-    const guess: string = gameState.userGuess.toUpperCase()
-
-    if (!guess.trim()) return
-
-    if (gameState.usedWords.has(guess)) {
-      toast.error("You've already used this word!", {
-        duration: 2000,
-        style: {
-          background: "#FEE2E2",
-          color: "#991B1B",
-        },
-      })
-      setGameState((prev) => ({
-        ...prev!,
-        message: "Word already used!",
-        isCorrect: false,
-        userGuess: "",
-      }))
-      inputRef.current?.focus()
-      return
-    }
-
-    if (guess.length < 3) {
-      toast.error("Word must be at least 3 letters long!", {
-        duration: 2000,
-        style: {
-          background: "#FEE2E2",
-          color: "#991B1B",
-        },
-      })
-      setGameState((prev) => ({
-        ...prev!,
-        message: "Word must be at least 3 letters long!",
-        isCorrect: false,
-      }))
-      inputRef.current?.focus()
-      return
-    }
-
-    if (!checkWord(guess)) {
-      toast.error("Incorrect word!", {
-        duration: 2000,
-        style: {
-          background: "#FEE2E2",
-          color: "#991B1B",
-        },
-      })
-      setGameState((prev) => ({
-        ...prev!,
-        message: "Incorrect word!",
-        userGuess: "",
-        isCorrect: false,
-      }))
-      inputRef.current?.focus()
-      return
-    }
-
-    if (isValidWord(guess)) {
-      const pointsEarned = getWordScore(guess.length)
-      toast.success(`${guess} is correct! +${pointsEarned} points!`, {
-        duration: 2000,
-        style: {
-          background: "#DCFCE7",
-          color: "#166534",
-        },
-      })
-
-      setGameState((prev) => ({
-        ...prev!,
-        score: prev!.score + pointsEarned,
-        message: "Correct! 🎉",
-        isCorrect: true,
-        userGuess: "",
-        usedWords: new Set([...prev!.usedWords, guess]),
-      }))
-      inputRef.current?.focus()
-    } else {
-      toast.error("Incorrect word!", {
-        duration: 2000,
-        style: {
-          background: "#FEE2E2",
-          color: "#991B1B",
-        },
-      })
-      setGameState((prev) => ({
-        ...prev!,
-        message: "Incorrect word!",
-        isCorrect: false,
-      }))
-      inputRef.current?.focus()
-    }
-  }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    if (!gameState || !gameState.isGameActive) return
-
-    const newValue = e.target.value.toUpperCase()
-
-    if (newValue.length === 1 && !gameState.hasStarted) {
-      setGameState((prev) => ({
-        ...prev!,
-        userGuess: newValue,
-        hasStarted: true,
-      }))
-    } else {
-      setGameState((prev) => ({
-        ...prev!,
-        userGuess: newValue,
-      }))
-    }
-  }
+  // Record the score once when the clock runs out.
+  const isOver = gameState !== null && !gameState.isGameActive
+  useEffect(() => {
+    if (isOver && gameState) setIsNewBest(gameState.score > 0 && submit(gameState.score))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOver])
 
   if (!gameState) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center">
-        <div className="bg-white bg-opacity-90 backdrop-blur-lg rounded-2xl shadow-2xl p-8">
-          <p className="text-xl font-bold text-blue-600">Loading...</p>
-        </div>
-      </div>
+      <GameShell gameId="anagrams" best={best}>
+        <Panel className="h-80 animate-pulse">{null}</Panel>
+      </GameShell>
+    )
+  }
+
+  const possibleWords = anagrams[letterSets[gameState.randomIndex]]
+
+  const startNewGame = () => {
+    setGameState(newGame())
+    setFeedback(null)
+    setIsNewBest(false)
+    window.setTimeout(() => inputRef.current?.focus(), 0)
+  }
+
+  const handleShuffle = () => {
+    if (!gameState.isGameActive) return
+    setGameState((prev) => ({ ...prev!, shuffledLetters: shuffleLetters(prev!.letters) }))
+    inputRef.current?.focus()
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!gameState.isGameActive) return
+    const guess = gameState.userGuess.trim().toUpperCase()
+    if (!guess) return
+
+    const clear = () => setGameState((prev) => ({ ...prev!, userGuess: "" }))
+
+    if (gameState.usedWords.includes(guess)) {
+      setFeedback({ ok: false, text: `You already found ${guess}` })
+      clear()
+    } else if (guess.length < 3) {
+      setFeedback({ ok: false, text: "Words need at least 3 letters" })
+    } else if (guess.length > 6 || !possibleWords.includes(guess.toLowerCase())) {
+      setFeedback({ ok: false, text: `${guess} isn't in the word list` })
+      clear()
+    } else {
+      const points = getWordScore(guess.length)
+      setFeedback({ ok: true, text: `${guess} +${points.toLocaleString()}` })
+      setGameState((prev) => ({
+        ...prev!,
+        score: prev!.score + points,
+        userGuess: "",
+        usedWords: [...prev!.usedWords, guess],
+      }))
+    }
+    inputRef.current?.focus()
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!gameState.isGameActive) return
+    const userGuess = e.target.value.toUpperCase().replace(/[^A-Z]/g, "")
+    setGameState((prev) => ({
+      ...prev!,
+      userGuess,
+      hasStarted: prev!.hasStarted || userGuess.length > 0,
+    }))
+  }
+
+  if (isOver) {
+    return (
+      <GameShell gameId="anagrams" best={best}>
+        <Panel className="space-y-8">
+          <ResultHeader
+            eyebrow="Time's up"
+            title={`${gameState.score.toLocaleString()} pts`}
+            description={`You found ${gameState.usedWords.length} of ${possibleWords.length} possible words from ${gameState.letters.toUpperCase()}.`}
+            newBest={isNewBest}
+          />
+          {gameState.usedWords.length > 0 && (
+            <ul className="flex flex-wrap justify-center gap-2">
+              {gameState.usedWords.map((word) => (
+                <li
+                  key={word}
+                  className="rounded-full bg-good-soft px-3 py-1 text-sm font-medium text-good"
+                >
+                  {word}
+                </li>
+              ))}
+            </ul>
+          )}
+          <Button fullWidth onClick={startNewGame}>
+            Play again
+          </Button>
+        </Panel>
+      </GameShell>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex flex-col items-center justify-center p-4">
-      <Toaster position="top-center" />
-      <header className="w-full max-w-4xl mx-auto px-4 py-6 mb-8">
-        <nav className="flex justify-between items-center">
-          <Link
-            href="/"
-            className="text-2xl font-bold text-white flex items-center"
-          >
-            <GiBrain className="mr-2 text-3xl" />
-            MemoryMaster
-          </Link>
-        </nav>
-      </header>
-      <div className="bg-white bg-opacity-90 backdrop-blur-lg rounded-2xl shadow-2xl p-8 max-w-md w-full">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-extrabold text-blue-600">Anagrams</h1>
-          <div className="flex flex-col items-end">
-            <span className="text-xl font-bold text-purple-600">
-              Score: <AnimatedScore value={gameState.score} />
-            </span>
-            <span className="text-sm text-gray-600">
-              Words found: {gameState.usedWords.size}
-            </span>
-          </div>
+    <GameShell gameId="anagrams" best={best}>
+      <Panel className="space-y-6">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          <Stat label="Score" value={gameState.score.toLocaleString()} tone="brand" />
+          <Stat label="Words" value={gameState.usedWords.length} />
+          <Stat label="Time" value={`${gameState.timeLeft}s`} />
         </div>
 
-        <div className="mb-4">
-          <div className="flex justify-between items-center mb-2">
-            <p className="text-lg font-semibold text-gray-700">
-              Make words using these letters:
-            </p>
-            <button
-              onClick={handleShuffle}
-              className="p-1 text-blue-600 hover:text-blue-800 hover:scale-110 transition-all duration-300 bg-blue-100 rounded"
-              disabled={!gameState.isGameActive}
-              title="Shuffle Letters"
-            >
-              <Shuffle size={32} color="blue" strokeWidth={1.5} />
-            </button>
-          </div>
-          <div className="flex flex-wrap justify-center gap-2 mt-2">
-            {gameState.shuffledLetters
-              .split("")
-              .map((letter: string, index: number) => (
-                <div
-                  key={index}
-                  className="w-9 h-9 bg-blue-200 rounded-lg flex items-center justify-center text-3xl font-bold text-blue-800 transform hover:scale-110 transition-transform md:w-12 md:h-12 shadow"
-                >
-                  {letter.toUpperCase()}
-                </div>
-              ))}
-          </div>
-        </div>
-
-        <input
-          ref={inputRef}
-          type="text"
-          value={gameState.userGuess}
-          onChange={handleInputChange}
-          placeholder="Type to start the game!"
-          className="w-full p-2 border border-gray-300 rounded-md mb-4"
-          maxLength={7}
-          disabled={!gameState.isGameActive}
+        <ProgressBar
+          value={(gameState.timeLeft / GAME_SECONDS) * 100}
+          label="Time remaining"
         />
-        <span className="flex text-lg font-semibold text-gray-600 mb-4 justify-center text-purple-500">
-          {!gameState.hasStarted
-            ? "Type your first letter to start the timer!"
-            : `Time: ${gameState.timeLeft}s`}
-        </span>
 
-        <div className="space-y-4">
-          {gameState.isGameActive ? (
-            <button
-              onClick={handleSubmit}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105 shadow-lg"
+        <div className="flex items-center justify-center gap-2 sm:gap-3">
+          {gameState.shuffledLetters.split("").map((letter, index) => (
+            <span
+              key={`${letter}-${index}`}
+              className="flex h-12 w-12 items-center justify-center rounded-xl border border-line bg-surface-2 text-2xl font-semibold sm:h-14 sm:w-14"
             >
-              Submit
-            </button>
-          ) : (
-            <button
-              onClick={startNewGame}
-              className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-3 px-6 rounded-full hover:from-green-600 hover:to-green-700 transition duration-300 transform hover:scale-105 shadow-lg"
-            >
-              Play Again
-            </button>
-          )}
+              {letter.toUpperCase()}
+            </span>
+          ))}
+          <button
+            type="button"
+            onClick={handleShuffle}
+            title="Shuffle letters"
+            aria-label="Shuffle letters"
+            className="focus-ring ml-1 flex h-10 w-10 items-center justify-center rounded-xl text-muted hover:bg-surface-2 hover:text-ink"
+          >
+            <Shuffle size={18} aria-hidden />
+          </button>
         </div>
 
-        <p className="mt-4 text-sm text-gray-600 text-center">
-          Make words of 3-6 letters.
-          <br />
-          Points: 3️⃣=100pts, 4️⃣=400pts, 5️⃣=1200pts, 6️⃣=2000pts!
+        <form onSubmit={handleSubmit} className="flex gap-2">
+          <input
+            ref={inputRef}
+            value={gameState.userGuess}
+            onChange={handleInputChange}
+            placeholder="Type a word"
+            aria-label="Your word"
+            maxLength={7}
+            autoComplete="off"
+            autoCapitalize="characters"
+            autoCorrect="off"
+            spellCheck={false}
+            autoFocus
+            className="focus-ring h-12 min-w-0 flex-1 rounded-xl border border-line bg-surface px-4 text-base font-medium uppercase tracking-wider placeholder:normal-case placeholder:tracking-normal placeholder:text-muted"
+          />
+          <Button type="submit" className="shrink-0">
+            Enter
+          </Button>
+        </form>
+
+        <p
+          aria-live="polite"
+          className={cx(
+            "min-h-[1.25rem] text-center text-sm font-medium",
+            feedback ? (feedback.ok ? "text-good" : "text-bad") : "text-muted"
+          )}
+        >
+          {feedback?.text ??
+            (gameState.hasStarted ? "" : "The 60-second clock starts on your first letter.")}
         </p>
-      </div>
-      <GameOverModal
-        isOpen={!gameState.isGameActive}
-        score={gameState.score}
-        wordsFound={gameState.usedWords.size}
-        onPlayAgain={startNewGame}
-        possibleWords={Object.values(anagrams)[gameState.randomIndex].length}
-      />
-    </div>
+
+        <div className="grid grid-cols-4 gap-2 text-center text-xs text-muted">
+          {[3, 4, 5, 6].map((n) => (
+            <div key={n} className="rounded-lg bg-surface-2 py-2">
+              <div className="font-semibold text-ink">{n} letters</div>
+              <div className="tabular-nums">{getWordScore(n).toLocaleString()} pts</div>
+            </div>
+          ))}
+        </div>
+      </Panel>
+    </GameShell>
   )
 }
 
