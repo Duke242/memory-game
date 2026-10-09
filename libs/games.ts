@@ -32,9 +32,10 @@ export const games: GameMeta[] = [
     href: "/alertness",
     skill: "Reaction & vigilance",
     description:
-      "A 3-minute reaction test. See whether you're as sharp as usual today.",
+      "A 1- or 3-minute reaction test. See whether you're as sharp as usual today.",
     icon: Zap,
     bestKey: "alertness",
+    bestMode: "3 min",
     format: "ms",
     isNew: true,
   },
@@ -170,6 +171,8 @@ export const describeHistoryKey = (
       return { game, mode: a ? `${a} display time` : null }
     case "card-match":
       return { game, mode: a ? `${CARD_BOARDS[a] ?? a} board` : null }
+    case "alertness":
+      return { game, mode: a === "1m" ? "1-minute quick check" : "3-minute test" }
     case "word-recall":
       return { game, mode: a ? `${a} words${b ? ` · ${b} study` : ""}` : null }
     default:
