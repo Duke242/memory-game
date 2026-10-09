@@ -3,19 +3,40 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
 import GameShell from "@/components/game/GameShell"
 import BaselineNote from "@/components/game/BaselineNote"
-import { Button, Panel, ProgressBar, ResultHeader, Stat, cx } from "@/components/game/ui"
+import {
+  Button,
+  Field,
+  Panel,
+  ProgressBar,
+  ResultHeader,
+  SegmentedControl,
+  Stat,
+  cx,
+} from "@/components/game/ui"
 import { useBestScore } from "@/libs/useBestScore"
 import { recordResult, type Comparison } from "@/libs/history"
 
-// Parameters follow the 3-minute PVT-B (Basner et al., 2011).
-const TEST_MS = 3 * 60 * 1000
+// Parameters follow the 3-minute PVT-B (Basner et al., 2011). The 1-minute
+// quick check uses the same rules but is noisier, so it keeps its own history.
 const MIN_GAP_MS = 1000
 const MAX_GAP_MS = 4000
 const LAPSE_MS = 355
 const FALSE_START_MS = 100
 const TIMEOUT_MS = 5000
 const FEEDBACK_MS = 600
-const MIN_RESPONSES = 20
+
+interface Length {
+  minutes: number
+  /** History and best-score key; the 3-minute test keeps the original key. */
+  key: string
+  /** Fewest reactions for a result worth saving (about a third of a typical run). */
+  minResponses: number
+}
+
+const LENGTHS: Length[] = [
+  { minutes: 1, key: "alertness:1m", minResponses: 8 },
+  { minutes: 3, key: "alertness", minResponses: 20 },
+]
 
 type Phase = "intro" | "running" | "aborted" | "done"
 type Trial = "wait" | "stimulus" | "feedback" | "early"
@@ -49,6 +70,7 @@ const summarize = (rts: number[], falseStarts: number): Results => {
 }
 
 const AlertnessPage = () => {
+  const [length, setLength] = useState<Length>(LENGTHS[0])
   const [phase, setPhase] = useState<Phase>("intro")
   const [trial, setTrial] = useState<Trial>("wait")
   const [counter, setCounter] = useState(0)
@@ -57,7 +79,7 @@ const AlertnessPage = () => {
   const [results, setResults] = useState<Results | null>(null)
   const [comparison, setComparison] = useState<Comparison | null>(null)
   const [isNewBest, setIsNewBest] = useState(false)
-  const { best, submit } = useBestScore("alertness", { lowerIsBetter: true })
+  const { best, submit } = useBestScore(length.key, { lowerIsBetter: true })
 
   const startedAt = useRef(0)
   const onset = useRef<number | null>(null)
@@ -66,6 +88,7 @@ const AlertnessPage = () => {
   const timers = useRef<number[]>([])
   const frame = useRef<number | null>(null)
   const trialRef = useRef<Trial>("wait")
+  const testMs = length.minutes * 60 * 1000
 
   const setTrialState = (t: Trial) => {
     trialRef.current = t
@@ -86,9 +109,9 @@ const AlertnessPage = () => {
     clearTimers()
     const summary = summarize(rts.current, falseStarts.current)
     setResults(summary)
-    if (summary.responses >= MIN_RESPONSES) {
+    if (summary.responses >= length.minResponses) {
       setComparison(
-        recordResult("alertness", summary.median, {
+        recordResult(length.key, summary.median, {
           lowerIsBetter: true,
           extra: {
             lapses: summary.lapses,
@@ -100,14 +123,14 @@ const AlertnessPage = () => {
       setIsNewBest(submit(summary.median))
     }
     setPhase("done")
-  }, [submit])
+  }, [submit, length])
 
   // Schedule the next stimulus after a random gap, unless the test is over.
   const scheduleNext = useCallback(
     (fromNow: number) => {
       const gap = randomGap()
-      if (performance.now() - startedAt.current + gap > TEST_MS) {
-        later(finish, Math.max(0, TEST_MS - (performance.now() - startedAt.current)))
+      if (performance.now() - startedAt.current + gap > testMs) {
+        later(finish, Math.max(0, testMs - (performance.now() - startedAt.current)))
         return
       }
       later(() => {
@@ -116,7 +139,7 @@ const AlertnessPage = () => {
         setTrialState("stimulus")
       }, Math.max(fromNow, gap))
     },
-    [finish]
+    [finish, testMs]
   )
 
   // Time the stimulus from the frame it is painted in, and run the counter.
@@ -148,11 +171,11 @@ const AlertnessPage = () => {
   useEffect(() => {
     if (phase !== "running") return
     const id = window.setInterval(() => {
-      const left = 100 - ((performance.now() - startedAt.current) / TEST_MS) * 100
+      const left = 100 - ((performance.now() - startedAt.current) / testMs) * 100
       setRemaining(Math.max(0, left))
     }, 250)
     return () => window.clearInterval(id)
-  }, [phase])
+  }, [phase, testMs])
 
   // Switching tabs or apps makes the reaction times meaningless.
   useEffect(() => {
@@ -224,15 +247,15 @@ const AlertnessPage = () => {
     scheduleNext(0)
   }
 
-  const secondsLeft = Math.ceil((remaining / 100) * (TEST_MS / 1000))
+  const secondsLeft = Math.ceil((remaining / 100) * (testMs / 1000))
 
   return (
-    <GameShell gameId="alertness" best={best}>
+    <GameShell gameId="alertness" best={best} bestMode={`${length.minutes} min`}>
       {phase === "intro" && (
         <Panel className="space-y-6">
           <div className="space-y-3 text-muted">
             <p>
-              A 3-minute reaction test. A counter will appear at random moments:
+              A {length.minutes}-minute reaction test. A counter will appear at random moments:
               tap the box or press <kbd className="rounded border border-line bg-surface-2 px-1.5 py-0.5 text-xs font-semibold text-ink">Space</kbd>{" "}
               as fast as you can. Don&apos;t tap before it appears.
             </p>
@@ -242,13 +265,24 @@ const AlertnessPage = () => {
               results on this device, not with other people.
             </p>
           </div>
+          <Field
+            label="Test length"
+            hint={length.minutes === 1 ? "Quick check" : "Most reliable"}
+          >
+            <SegmentedControl<number>
+              label="Test length"
+              value={length.minutes}
+              onChange={(m) => setLength(LENGTHS.find((l) => l.minutes === m) ?? LENGTHS[0])}
+              options={LENGTHS.map((l) => ({ value: l.minutes, label: `${l.minutes} min` }))}
+            />
+          </Field>
           <ul className="space-y-2 rounded-xl bg-surface-2 p-4 text-sm text-muted">
-            <li>• Use the same device each time for comparable results.</li>
+            <li>• Use the same device and length each time for comparable results.</li>
             <li>• Find a quiet moment: switching tabs cancels the test.</li>
             <li>• This is a self-check for fun, not a medical test.</li>
           </ul>
           <Button fullWidth onClick={start}>
-            Start the 3-minute test
+            Start the {length.minutes}-minute test
           </Button>
         </Panel>
       )}
@@ -314,12 +348,12 @@ const AlertnessPage = () => {
 
       {phase === "done" && results && (
         <Panel className="space-y-8">
-          {results.responses >= MIN_RESPONSES ? (
+          {results.responses >= length.minResponses ? (
             <>
               <ResultHeader
                 eyebrow="Median reaction time"
                 title={`${results.median} ms`}
-                description={`${results.responses} reactions in 3 minutes.`}
+                description={`${results.responses} reactions in ${length.minutes} minute${length.minutes === 1 ? "" : "s"}.`}
                 newBest={isNewBest}
               />
               <div className="grid grid-cols-2 gap-2 sm:gap-3">
@@ -341,8 +375,8 @@ const AlertnessPage = () => {
           ) : (
             <ResultHeader
               eyebrow="Not enough reactions"
-              title={`${results.responses} / ${MIN_RESPONSES}`}
-              description="We need at least 20 reactions for a reliable result, so this one wasn't saved."
+              title={`${results.responses} / ${length.minResponses}`}
+              description={`We need at least ${length.minResponses} reactions for a reliable result, so this one wasn't saved.`}
             />
           )}
           <Button fullWidth onClick={start}>
